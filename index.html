@@ -124,6 +124,8 @@ body.notesview #printnotes{display:block;background:#fff;color:#111;font:14px/1.
 }
 .mode-furn .fx,.mode-furn .fx *{pointer-events:none!important}
 .mode-edit .pc,.mode-edit .pc *{pointer-events:none!important}
+.mode-sketch .pc,.mode-sketch .pc *,.mode-sketch .fx,.mode-sketch .fx *{pointer-events:none!important}
+.mode-sketch.sk-draw{cursor:crosshair}.mode-sketch .rf{cursor:move}.mode-sketch.sk-draw .rf{cursor:crosshair}
 .mode-edit .fx{cursor:move}.pc{cursor:grab}.hd{cursor:pointer}.lt{cursor:move}
 #banner{display:none;position:absolute;left:8px;right:60px;top:8px;background:#102a44;border:1px solid var(--acc);border-radius:10px;padding:8px 10px;font-size:13px;z-index:5;align-items:center;gap:8px;flex-wrap:wrap}
 #banner.show{display:flex}#banner span{flex:1;min-width:180px}
@@ -139,13 +141,61 @@ ol.reason{margin:6px 0 0;padding:0;list-style:none}ol.reason li{display:flex;gap
 .bn{flex:0 0 20px;height:20px;border-radius:50%;background:#ffd34d;color:#111;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
 .lockbtn{padding:0 4px;border:0;background:transparent;font-size:13px}.lockbtn.on{filter:none}
 .issue.walkway,.issue.tvdist{color:var(--warn)}
+
+/* ====================== SKETCH MODE ====================== */
+#skbar{display:none;position:absolute;left:8px;top:8px;right:60px;gap:4px;flex-wrap:wrap;align-items:center;z-index:4;pointer-events:none}
+#skbar>*{pointer-events:auto}
+#skbar button{background:var(--panel);box-shadow:0 2px 8px #0008}
+#skbar button.on{background:#23407a;border-color:var(--acc)}
+#skbar .sep{width:6px}
+body.sketching #skbar{display:flex}
+body.sketching #banner.show~#skbar{top:58px}
+#skStart{display:none;position:absolute;left:8px;top:8px;z-index:4;background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:4px 4px 4px 10px;gap:6px;align-items:center;font-size:13px;box-shadow:0 4px 16px #000a;max-width:calc(100% - 70px);flex-wrap:wrap}
+#skStart.show{display:flex}
+#skStart #skStartX{min-height:28px;padding:2px 8px;border:0;background:transparent;color:var(--mut)}
+#skEmpty{display:none;position:absolute;left:0;right:0;bottom:14px;justify-content:center;pointer-events:none;z-index:3;padding:0 12px}
+#skEmpty.show{display:flex}
+#skEmpty .skcard{pointer-events:auto;background:var(--panel2);border:1px dashed var(--acc);border-radius:var(--r);padding:12px 14px;max-width:440px;text-align:center;box-shadow:0 6px 24px #000a}
+#skEmpty .skcard b{font-size:15px}
+.mode-sketch .skw{cursor:move}
+.mode-sketch.sk-draw .skw{cursor:crosshair}
+#cardSketch #skHintText{margin-bottom:6px}
+@media (max-width:820px){ #skbar{right:52px;top:6px;left:6px} #skbar button{padding:4px 7px;font-size:13px;min-height:32px} #skEmpty{bottom:8px} #skbar #skBlank{display:none} #skEmpty .skcard{padding:8px 10px;font-size:13px} }
+/* ====================== VIDEO WALKTHROUGH ====================== */
+#vmodal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:85;padding:12px}
+#vmodal.show{display:flex}
+#vmodal .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;max-width:640px;width:100%;max-height:92vh;overflow:auto}
+#vmodal .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.vm-private{font-size:12px;color:var(--ok);margin:-2px 0 8px}
+.vm-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.vm-choice{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;white-space:normal;text-align:center;min-height:120px;justify-content:center}
+.vm-choice:hover,.vm-choice:focus{border-color:var(--acc);outline:none}
+.vm-choice .big{font-size:30px}
+.btnlike{display:inline-flex;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;min-height:34px}
+.btnlike.primary{background:#23407a;border-color:var(--acc)}
+.vm-ul{margin:6px 0 0;padding-left:18px}.vm-ul li{margin:4px 0}
+.vm-live video{width:100%;max-height:46vh;background:#000;border-radius:8px;display:block}
+.recdot{color:var(--bad);animation:blink 1s infinite}@keyframes blink{50%{opacity:.2}}
+.vm-stage{display:flex;justify-content:space-between;margin:8px 0 4px}
+.vm-bar{height:12px}.vm-bar i{transition:width .15s}
+ol.vm-stages{margin:10px 0 0;padding-left:20px;font-size:13px;color:var(--mut)}ol.vm-stages li{margin:3px 0}
+ol.vm-stages li.done{color:var(--ok)}ol.vm-stages li.done::after{content:' ✓'}ol.vm-stages li.cur{color:var(--txt);font-weight:600}
+.vm-fail{background:#2a1a1f;border:1px solid #6e2c34;border-radius:var(--r);padding:10px 12px}
+.vm-fail p{margin:6px 0}
+.vm-head{display:flex;gap:12px;align-items:center;margin:6px 0}
+.vm-prev{width:100%;height:150px;background:#0a0e16;border:1px solid var(--line);border-radius:8px;margin:6px 0}
+.vm-note{background:#2a2414;border:1px solid #6e5226;border-radius:8px;padding:8px 10px;font-size:13px;margin:6px 0}
+.vm-tablewrap{overflow-x:auto}
+.vm-table{width:100%;border-collapse:collapse;font-size:13px}.vm-table td,.vm-table th{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
+.vm-table input{width:100%;min-width:90px}
+@media (max-width:820px){ .vm-choices{grid-template-columns:1fr} .vm-choice{min-height:84px} }
 </style>
 </head>
 <body>
 <div id="app">
 <header id="top">
   <div class="brand">🏠 Room Planner<small id="verTag"></small></div>
-  <div class="grp seg" id="modeSeg"><button id="mFurn" class="on" title="Move furniture">Furniture</button><button id="mEdit" title="Edit walls, doors, windows, built-ins">Edit Room</button></div>
+  <div class="grp seg" id="modeSeg"><button id="mFurn" class="on" title="Move furniture">Furniture</button><button id="mEdit" title="Edit walls, doors, windows, built-ins">Edit Room</button><button id="mSketch" title="Sketch mode: draw rooms and walls to rough out a house layout">Sketch</button></div>
   <div class="grp"><button id="btnUndo" title="Undo (Ctrl+Z)">↶</button><button id="btnRedo" title="Redo (Ctrl+Y)">↷</button></div>
   <div class="grp"><button id="btnRot" title="Rotate selected piece 90° (R / double-click)">⟳ Rotate</button>
     <button id="btnSnap" class="on" title="Toggle grid snap">Snap</button><select id="selGrid" title="Grid size"></select></div>
@@ -153,6 +203,7 @@ ol.reason{margin:6px 0 0;padding:0;list-style:none}ol.reason li{display:flex;gap
   <div class="grp" id="grpPlanOps"><button id="btnRotPlan" title="Rotate whole plan 90°">Rotate plan</button><button id="btnMirror" title="Mirror left↔right">Mirror</button><button id="btnFlip" title="Flip top↔bottom">Flip</button></div>
   <div class="grp"><button id="btnRand" title="Randomize the selected room from the active vibe (feng shui aware)">🎲 Randomize</button><button id="fengPill" class="pill" title="Feng shui score">Feng –</button><span id="seedTag" class="small" title="Randomizer seed (same seed + same plan = same layout)"></span></div>
   <div class="grp"><button id="btnLight" title="Lighting overlay">💡 Lighting</button></div>
+  <div class="grp"><button id="btnVideo" title="Beta: rough room-by-room layout from a walkthrough video (processed on this device)">🎥 Video walkthrough</button></div>
   <div class="grp"><button id="btnNew">New plan</button><button id="btnShare" title="Copy a link that contains this whole plan">🔗 Share</button></div>
   <div class="grp"><button id="btnReset">Reset</button><button id="btnExport">Export</button><button id="btnImport">Import</button><input type="file" id="fileImport" accept=".json,application/json" hidden></div>
 </header>
@@ -160,12 +211,17 @@ ol.reason{margin:6px 0 0;padding:0;list-style:none}ol.reason li{display:flex;gap
   <section id="stage">
     <svg id="svg" xmlns="http://www.w3.org/2000/svg"><defs id="defs"></defs><g id="world"></g></svg>
     <div id="banner"></div><div id="hint"></div>
+    <div id="skbar" role="toolbar" aria-label="Sketch tools"><button data-tool="select" title="Select / move / resize rooms (V)">↖ Select</button><button data-tool="room" title="Drag a rectangle to draw a room (B)">▭ Draw room</button><button data-tool="walls" title="Click corners to draw walls (W)">✎ Draw walls</button><button data-tool="erase" title="Tap a room or sketch wall to delete it (E)">⌫ Eraser</button><button id="skFinish" class="primary" style="display:none">✓ Finish walls</button><span class="sep"></span><button id="skBlank" title="Clear to a blank plan (undoable)">Start blank</button><button id="skVideo" title="Beta: rough layout from a walkthrough video">🎥 Video</button></div>
+    <div id="skStart"><span>New here? <b>Start from scratch:</b></span><button id="skStartBtn" class="primary">✏️ Sketch your layout</button><button id="skStartX" title="Hide this tip" aria-label="Hide this tip">✕</button></div>
+    <div id="skEmpty"><div class="skcard"><b>Blank plan</b><div class="small">Rough out your home: drag rectangles for rooms, or click corners to draw walls. Then switch to <b>Furniture</b> to furnish it.</div><div class="row" style="justify-content:center"><button id="skEmptyRoom" class="primary">▭ Draw room</button><button id="skEmptyWalls">✎ Draw walls</button><button id="skEmptyVideo">🎥 Video walkthrough (beta)</button></div></div></div>
     <div id="zoomctl"><button id="zIn" title="Zoom in">+</button><button id="zOut" title="Zoom out">−</button><button id="zFit" title="Fit all" style="width:auto">Fit all</button></div>
     <div id="status"></div>
   </section>
   <aside id="side">
     <nav id="tabs"><button data-tab="plan" class="on">Plan</button><button data-tab="vibe">Vibe &amp; Shop</button><button data-tab="feng">Feng Shui</button></nav>
     <div class="tabpane on" id="tab-plan">
+      <div class="card" id="cardSketch" style="display:none"><h3>Sketch <span class="pill">rough layout</span></h3><div id="skBody"></div></div>
+      <div class="card" id="cardVideo"><h3>Video walkthrough <span class="pill warn">Beta</span></h3><div class="small">Upload or record a slow walk through your home and get a <b>rough</b> room-by-room layout estimate. Processed entirely on this device – nothing is uploaded.</div><div class="row"><button id="btnVideoCard">🎥 Start video walkthrough</button></div></div>
       <div class="card" id="cardSel"><h3>Selection</h3><div id="selBody" class="small">Nothing selected. Tap a piece or fixture.</div></div>
       <div class="card" id="cardView"><h3>Viewing distance</h3><div id="viewBody" class="small"></div></div>
       <div class="card" id="cardIssues"><h3>Layout checks</h3><div id="issuesBody" class="small"></div></div>
@@ -183,6 +239,7 @@ ol.reason{margin:6px 0 0;padding:0;list-style:none}ol.reason li{display:flex;gap
 </div>
 <div id="toast"></div>
 <div id="modal"><div class="box"></div></div>
+<div id="vmodal" role="dialog" aria-modal="true" aria-labelledby="vmTitle"><div class="box" id="vmBox"></div></div>
 <div id="printnotes"></div>
 <script>
 /* ---- 10-core.js ---- */
@@ -214,6 +271,8 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 function fmtIn(n) { n = Math.round(n * 10) / 10; const neg = n < 0; n = Math.abs(n); const ft = Math.floor(n / 12); const inch = rnd1(n - ft * 12); return (neg ? '-' : '') + (ft ? ft + '′' : '') + (inch || !ft ? inch + '″' : ''); }
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const CUT_TYPES = new Set(['angledDoor', 'angledWindow', 'angledOpening']); // corner fixtures that cut (chamfer) the room corner
+const isCutFix = f => !!f && CUT_TYPES.has(f.type);
 const V = { add: (a, b) => [a[0] + b[0], a[1] + b[1]], sub: (a, b) => [a[0] - b[0], a[1] - b[1]], mul: (a, k) => [a[0] * k, a[1] * k], dot: (a, b) => a[0] * b[0] + a[1] * b[1], len: a => Math.hypot(a[0], a[1]), norm: a => { const l = Math.hypot(a[0], a[1]) || 1; return [a[0] / l, a[1] / l]; } };
 
 /* ====================== PIECE CATALOG ====================== */
@@ -251,31 +310,36 @@ function newRoom(o) { return Object.assign({ id: uid('r_'), name: 'Room', type: 
 function samuelsRoom() {
   return newRoom({
     id: 'r1', name: 'Living room', type: 'living', x: 0, y: 0, w: 240, d: 204,
-    wallLabels: { top: 'Front door wall', right: '“Dogs Playing Poker” wall', bottom: 'Built-ins wall', left: 'Hepburn wall' },
+    // Layout checked against Samuel's photos + walkthrough video (Oct 2026). Positions are ESTIMATES – nothing was measured.
+    wallLabels: { top: 'Front door wall', right: '“Dogs Playing Poker” wall', bottom: 'Hallway & fireplace wall', left: 'Built-ins wall' },
     fixtures: [
       { id: 'f_door', type: 'door', wall: 'top', pos: 14, len: 36, swing: 'in', hinge: 'start', entry: true, label: 'Front door 36″' },
+      { id: 'f_neon', type: 'art', wall: 'top', pos: 58, len: 24, label: 'Neon sign' },
       { id: 'f_win_top', type: 'window', wall: 'top', pos: 126, len: 40, blinds: true, label: 'Window + blinds 40″' },
-      { id: 'f_win_r1', type: 'window', wall: 'right', pos: 22, len: 36, label: 'Window' },
+      { id: 'f_planet', type: 'art', wall: 'top', pos: 176, len: 16, label: 'Yellow planet painting' },
+      { id: 'f_hokusai', type: 'art', wall: 'right', pos: 2, len: 18, label: 'Hokusai wave poster' },
+      { id: 'f_win_r1', type: 'window', wall: 'right', pos: 22, len: 36, curtain: true, label: 'Window + navy curtain' },
       { id: 'f_art_dogs', type: 'art', wall: 'right', pos: 78, len: 36, label: '“Dogs Playing Poker”' },
-      { id: 'f_win_r2', type: 'window', wall: 'right', pos: 132, len: 36, label: 'Window' },
-      { id: 'f_builtin', type: 'builtin', wall: 'bottom', pos: 44, len: 136, depth: 18, label: 'Built-ins 136×18″' },
-      { id: 'f_tvmount', type: 'tvmount', wall: 'bottom', pos: 96, len: 32, depth: 3, label: 'TV mount (empty)' },
-      { id: 'f_fire', type: 'fireplace', corner: 'br', a: 60, b: 28, label: 'Stone fireplace' },
-      { id: 'f_hall', type: 'opening', wall: 'left', pos: 30, len: 42, label: 'Hallway opening' },
-      { id: 'f_hep', type: 'art', wall: 'left', pos: 108, len: 24, label: 'Audrey Hepburn portrait' },
-      { id: 'f_bed', type: 'angledDoor', corner: 'bl', a: 30, b: 30, len: 36, swing: 'out', hinge: 'start', label: 'Bedroom door (angled – guess)' }
+      { id: 'f_win_r2', type: 'window', wall: 'right', pos: 132, len: 36, curtain: true, label: 'Window + curtain (behind TV)' },
+      { id: 'f_fire', type: 'fireplace', corner: 'br', a: 60, b: 28, label: 'Stone fireplace (deer skull above)' },
+      { id: 'f_hep', type: 'art', wall: 'bottom', pos: 70, len: 30, label: 'Pop-art “Chanel No.5” (Audrey Hepburn)' },
+      { id: 'f_bed', type: 'angledOpening', corner: 'bl', a: 30, b: 30, len: 36, label: 'Hallway opening (angled)' },
+      { id: 'f_hall', type: 'opening', wall: 'left', pos: 30, len: 42, label: 'Opening to next room' },
+      { id: 'f_builtin', type: 'builtin', wall: 'left', pos: 74, len: 84, depth: 18, label: 'Built-ins 84×18″' },
+      { id: 'f_tvmount', type: 'tvmount', wall: 'left', pos: 102, len: 28, depth: 3, label: 'TV mount (empty)' },
+      { id: 'f_portrait', type: 'art', wall: 'left', pos: 158, len: 16, label: 'Pencil portrait (man)' }
     ]
   });
 }
 function samuelsPieces() {
   return [
-    { id: 'p_tv', type: 'tv', name: 'TV 75"', x: 112, y: 202.5, w: 66, d: 3, rot: 180, wallMount: true },
-    { id: 'p_sofa', type: 'sofa', name: 'Sofa', x: 112, y: 92, w: 88, d: 40, rot: 0 },
-    { id: 'p_love', type: 'loveseat', name: 'Loveseat', x: 200, y: 110, w: 64, d: 38, rot: 90 },
-    { id: 'p_rug', type: 'rug', name: 'Rug 8×10', x: 112, y: 125, w: 96, d: 120, rot: 90 },
-    { id: 'p_coffee', type: 'coffee', name: 'Coffee table', x: 112, y: 140, w: 48, d: 24, rot: 0 },
-    { id: 'p_side', type: 'side', name: 'Side table', x: 59, y: 92, w: 18, d: 18, rot: 0 },
-    { id: 'p_cons', type: 'console', name: 'TV console', x: 202, y: 9, w: 60, d: 18, rot: 0 }
+    { id: 'p_sofa', type: 'sofa', name: 'Sofa', x: 120, y: 120, w: 88, d: 40, rot: 270 },
+    { id: 'p_love', type: 'loveseat', name: 'Loveseat', x: 170, y: 36, w: 64, d: 38, rot: 0 },
+    { id: 'p_rug', type: 'rug', name: 'Rug 8×10', x: 150, y: 120, w: 96, d: 120, rot: 90 },
+    { id: 'p_coffee', type: 'coffee', name: 'Coffee table', x: 168, y: 120, w: 48, d: 24, rot: 90 },
+    { id: 'p_side', type: 'side', name: 'Side table', x: 85, y: 195, w: 18, d: 18, rot: 0 },
+    { id: 'p_cons', type: 'console', name: 'TV console', x: 231, y: 118, w: 60, d: 18, rot: 90 },
+    { id: 'p_tv', type: 'tv', name: 'TV 75"', x: 231, y: 118, w: 66, d: 3, rot: 90, wallMount: false }
   ];
 }
 function defaultPlan(kind) {
@@ -287,7 +351,7 @@ function defaultPlan(kind) {
 }
 function basePlan(rooms, pieces, lights) {
   return {
-    title: 'My plan', rooms, pieces, lights, openPairs: [],
+    title: 'My plan', rooms, pieces, lights, openPairs: [], sketchWalls: [],
     vibe: { theme: null, budget: CONFIG.defaultBudget, inPlan: {}, prices: {}, custom: [] },
     feng: { school: 'form', bagua: 'compass', doorBearing: 0, strength: 50, seed: 1, useKua: false },
     reasoning: null
@@ -317,6 +381,7 @@ function fixSelection() {
   if (s.kind === 'fixture' && !findFixture(s.id)) UI.sel = { kind: null, id: null };
   if (s.kind === 'room' && !S.rooms.find(r => r.id === s.id)) UI.sel = { kind: null, id: null };
   if (s.kind === 'light' && !S.lights.find(l => l.id === s.id)) UI.sel = { kind: null, id: null };
+  if (s.kind === 'skwall' && !(S.sketchWalls || []).find(w => w.id === s.id)) UI.sel = { kind: null, id: null };
 }
 let saveTimer = null;
 function afterEdit() {
@@ -360,7 +425,7 @@ function roomById(id) { return S.rooms.find(r => r.id === id); }
 function cornerCuts(r) {
   const c = { tl: null, tr: null, br: null, bl: null };
   if (r.shape === 'L' && r.notch) c[r.notch.corner] = { a: r.notch.a, b: r.notch.b, kind: 'notch' };
-  for (const f of r.fixtures) if (f.corner && (f.type === 'angledDoor' || f.type === 'angledWindow') && !c[f.corner]) c[f.corner] = { a: f.a, b: f.b, kind: 'chamfer', fid: f.id };
+  for (const f of r.fixtures) if (f.corner && isCutFix(f) && !c[f.corner]) c[f.corner] = { a: f.a, b: f.b, kind: 'chamfer', fid: f.id };
   return c;
 }
 function roomPoly(r) {
@@ -443,7 +508,7 @@ function diagBasis(r, f) {
 }
 // geometry of the opening/door gap of a wall or angled fixture: {a,b,u,n,len}
 function gapBasis(r, f) {
-  if (f.corner && (f.type === 'angledDoor' || f.type === 'angledWindow')) {
+  if (f.corner && isCutFix(f)) {
     const g = diagBasis(r, f), len = Math.min(f.len, g.L - 2), s = (g.L - len) / 2;
     const a = V.add(g.H, V.mul(g.u, s));
     return { a, b: V.add(a, V.mul(g.u, len)), u: g.u, n: g.n, len, angled: true };
@@ -462,7 +527,7 @@ function doorSwing(r, f) { // returns {hinge, closed, open, sn, radius, poly}
   return { hinge, closed, open, sn, radius: rad, poly, g };
 }
 function fixtureRect(r, f) { // world polygon of a depth-bearing wall fixture (builtin, tvmount, art) or corner block
-  if (f.type === 'fireplace' || (f.corner && f.type !== 'angledDoor' && f.type !== 'angledWindow')) {
+  if (f.type === 'fireplace' || (f.corner && !isCutFix(f))) {
     const cp = cornerPoint(r, f.corner), sg = cornerSigns(f.corner);
     const p2 = [cp[0] + sg[0] * f.a, cp[1] + sg[1] * f.b];
     return [cp, [p2[0], cp[1]], p2, [cp[0], p2[1]]];
@@ -602,11 +667,11 @@ function drawFixture(r, f, selected) {
   const cls = `fx${selected ? ' sel' : ''}`;
   let hit = '';
   switch (f.type) {
-    case 'door': case 'angledDoor': case 'slider': case 'opening': {
+    case 'door': case 'angledDoor': case 'slider': case 'opening': case 'angledOpening': {
       const g = gapBasis(r, f);
       s += gapPaint(g.a, g.b, g.n);
       // jambs
-      s += `<line x1="${rnd1(g.a[0])}" y1="${rnd1(g.a[1])}" x2="${rnd1(g.b[0])}" y2="${rnd1(g.b[1])}" stroke="${f.type === 'opening' ? pal.accent : wc}" stroke-width="0.8" stroke-dasharray="${f.type === 'opening' ? '3 3' : '0'}" opacity=".8"/>`;
+      s += `<line x1="${rnd1(g.a[0])}" y1="${rnd1(g.a[1])}" x2="${rnd1(g.b[0])}" y2="${rnd1(g.b[1])}" stroke="${/opening/i.test(f.type) ? pal.accent : wc}" stroke-width="0.8" stroke-dasharray="${/opening/i.test(f.type) ? '3 3' : '0'}" opacity=".8"/>`;
       for (const e of [g.a, g.b]) s += `<line x1="${rnd1(e[0] - g.n[0] * T / 2)}" y1="${rnd1(e[1] - g.n[1] * T / 2)}" x2="${rnd1(e[0] + g.n[0] * T / 2)}" y2="${rnd1(e[1] + g.n[1] * T / 2)}" stroke="${wc}" stroke-width="1.6"/>`;
       if (f.type === 'door' || f.type === 'angledDoor') {
         const w = doorSwing(r, f), cross = (w.closed[0] - w.hinge[0]) * (w.open[1] - w.hinge[1]) - (w.closed[1] - w.hinge[1]) * (w.open[0] - w.hinge[0]);
@@ -625,13 +690,14 @@ function drawFixture(r, f, selected) {
       const g = gapBasis(r, f);
       s += `<polygon points="${fp(quad(g.a, g.b, g.n, -T / 2, T / 2))}" fill="#8fd0ff" fill-opacity=".55" stroke="#bfe6ff" stroke-width=".7"/>`;
       s += `<line x1="${rnd1(g.a[0])}" y1="${rnd1(g.a[1])}" x2="${rnd1(g.b[0])}" y2="${rnd1(g.b[1])}" stroke="#e8f6ff" stroke-width=".8"/>`;
+      if (f.curtain) { const q = quad(g.a, g.b, g.n, T / 2, T / 2 + 3.2); s += `<polygon points="${fp(q)}" fill="#1d2a4a" stroke="#3a4f80" stroke-width=".5"/>`; const cnt = Math.max(2, Math.floor(g.len / 5)); for (let i = 1; i < cnt; i++) { const a = V.add(V.add(g.a, V.mul(g.u, i * g.len / cnt)), V.mul(g.n, T / 2)); const b = V.add(a, V.mul(g.n, 3.2)); s += `<line x1="${rnd1(a[0])}" y1="${rnd1(a[1])}" x2="${rnd1(b[0])}" y2="${rnd1(b[1])}" stroke="#0b1226" stroke-width=".5"/>`; } }
       if (f.blinds) {
         const q = quad(g.a, g.b, g.n, T / 2, T / 2 + 2.6); s += `<polygon points="${fp(q)}" fill="#d9e0ee" fill-opacity=".9"/>`;
         const cnt = Math.floor(g.len / 2.4);
         for (let i = 1; i < cnt; i++) { const a = V.add(V.add(g.a, V.mul(g.u, i * g.len / cnt)), V.mul(g.n, T / 2)); const b = V.add(a, V.mul(g.n, 2.6)); s += `<line x1="${rnd1(a[0])}" y1="${rnd1(a[1])}" x2="${rnd1(b[0])}" y2="${rnd1(b[1])}" stroke="#5b6780" stroke-width=".4"/>`; }
       }
       hit = `<line x1="${rnd1(g.a[0])}" y1="${rnd1(g.a[1])}" x2="${rnd1(g.b[0])}" y2="${rnd1(g.b[1])}" stroke="transparent" stroke-width="${Math.max(14, 22 / UI.view.z)}" pointer-events="stroke"/>`;
-      const m = V.add(V.mul(V.add(g.a, g.b), .5), V.mul(g.n, T / 2 + (f.blinds ? 2.6 : 0) + fs * 1.0)); lx = m[0]; ly = m[1]; labDim = g; break;
+      const m = V.add(V.mul(V.add(g.a, g.b), .5), V.mul(g.n, T / 2 + (f.blinds ? 2.6 : f.curtain ? 3.2 : 0) + fs * 1.0)); lx = m[0]; ly = m[1]; labDim = g; break;
     }
     case 'builtin': case 'tvmount': case 'art': {
       const q = fixtureRect(r, f), isB = f.type === 'builtin', isM = f.type === 'tvmount';
@@ -695,7 +761,7 @@ function render() {
   const z = UI.view.z, v = UI.view, pal = palette();
   const W = svg.clientWidth || 800, H = svg.clientHeight || 600;
   world.setAttribute('transform', `translate(${rnd1(-v.x * z * 100) / 100} ${rnd1(-v.y * z * 100) / 100}) scale(${z})`);
-  svg.setAttribute('class', (UI.mode === 'edit' ? 'mode-edit' : 'mode-furn') + (UI.space ? ' pan' : ''));
+  svg.setAttribute('class', (UI.mode === 'edit' ? 'mode-edit' : UI.mode === 'sketch' ? 'mode-sketch' + (UI.sk && UI.sk.tool !== 'select' ? ' sk-draw' : '') : 'mode-furn') + (UI.space ? ' pan' : ''));
   const g = UI.snap ? UI.grid : 12;
   let defs = `<pattern id="gridP" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#fff" stroke-opacity="${z < 1.2 ? .03 : .06}" stroke-width=".4"/></pattern><pattern id="gridF" width="${g * 2}" height="${g * 2}" patternUnits="userSpaceOnUse"><path d="M${g * 2} 0H0V${g * 2}" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width=".3"/></pattern>`;
   let o = `<rect x="${rnd1(v.x)}" y="${rnd1(v.y)}" width="${rnd1(W / z)}" height="${rnd1(H / z)}" fill="url(#gridP)" data-kind="bg"/>`;
@@ -779,10 +845,10 @@ function kelvinColor(k) { // rough colour temperature -> hex
   return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
 }
 function handles() {
-  if (UI.mode !== 'edit') return '';
+  if (UI.mode !== 'edit' && !(UI.mode === 'sketch' && UI.sk && UI.sk.tool === 'select')) return '';
   const z = UI.view.z, hr = Math.max(5, 9 / z); let o = '';
   const H = (x, y, id, h, extra = '') => `<circle class="hd" data-kind="handle" data-h="${h}" data-id="${id}" cx="${rnd1(x)}" cy="${rnd1(y)}" r="${rnd1(hr)}" fill="#6ea8fe" stroke="#fff" stroke-width="${rnd1(1.4 / z + .3)}" ${extra}/>`;
-  if (UI.sel.kind === 'fixture') {
+  if (UI.sel.kind === 'fixture' && UI.mode === 'edit') {
     const hit = findFixture(UI.sel.id); if (!hit) return '';
     const { f, r } = hit;
     if (f.corner) {
@@ -887,7 +953,8 @@ function deleteSelected() {
   if (k === 'piece') S.pieces = S.pieces.filter(p => p.id !== id);
   else if (k === 'fixture') { for (const r of S.rooms) r.fixtures = r.fixtures.filter(f => f.id !== id); }
   else if (k === 'light') S.lights = S.lights.filter(l => l.id !== id);
-  else if (k === 'room') { if (typeof deleteRoomConfirm === 'function') return deleteRoomConfirm(id); return; }
+  else if (k === 'room') { if (UI.mode === 'sketch' && typeof sketchDeleteRoom === 'function') return sketchDeleteRoom(id); if (typeof deleteRoomConfirm === 'function') return deleteRoomConfirm(id); return; }
+  else if (k === 'skwall') S.sketchWalls = (S.sketchWalls || []).filter(w => w.id !== id);
   UI.sel = { kind: null, id: null }; commit();
 }
 function duplicateSelected() {
@@ -915,7 +982,7 @@ function moveFixture(d, w) {
   if (f.corner) {
     let best = null;
     for (const rr of S.rooms) for (const c of CORNERS) {
-      const cuts = cornerCuts(rr); const isCut = f.type === 'angledDoor' || f.type === 'angledWindow';
+      const cuts = cornerCuts(rr); const isCut = isCutFix(f);
       if (isCut && cuts[c] && !(cuts[c].fid === f.id)) continue;
       const dd = V.len(V.sub(w, cornerPoint(rr, c))); if (!best || dd < best.d) best = { d: dd, r: rr, c };
     }
@@ -963,6 +1030,7 @@ function onDown(e) {
   const w = evWorld(e), sx = e.clientX, sy = e.clientY;
   drag = { kind, id, sx, sy, moved: false, w0: w, view0: Object.assign({}, UI.view), pointerType: e.pointerType };
   if (UI.space) { drag.type = 'pan'; return; }
+  if (UI.mode === 'sketch' && typeof sketchDown === 'function' && sketchDown(e, drag, t)) return;
   if (kind === 'piece' && UI.mode === 'furniture') {
     const p = S.pieces.find(q => q.id === id); if (!p) { drag.type = 'pan'; return; }
     UI.sel = { kind: 'piece', id }; drag.type = 'piece'; drag.off = [p.x - w[0], p.y - w[1]]; drag.locked = !!p.locked; drag.p0 = [p.x, p.y, p.rot];
@@ -970,11 +1038,11 @@ function onDown(e) {
   } else if (kind === 'fixture' && UI.mode === 'edit') {
     const h = findFixture(id); if (!h) { drag.type = 'pan'; return; }
     UI.sel = { kind: 'fixture', id }; Object.assign(drag, startFixtureDrag(h.f, h.r, w), { kind, id }); drag.type = 'fixture'; refreshAll(true);
-  } else if (kind === 'handle' && UI.mode === 'edit') {
+  } else if (kind === 'handle' && (UI.mode === 'edit' || (UI.mode === 'sketch' && String(t.dataset.h).startsWith('room-')))) {
     drag.type = 'handle'; drag.h = t.dataset.h;
   } else if (kind === 'light' && UI.light) {
     UI.sel = { kind: 'light', id }; const l = S.lights.find(q => q.id === id); drag.type = 'light'; drag.off = [l.x - w[0], l.y - w[1]]; refreshAll(true);
-  } else if (kind === 'room' && UI.mode === 'edit' && UI.sel.kind === 'room' && UI.sel.id === id && typeof startRoomDrag === 'function') {
+  } else if (kind === 'room' && ((UI.mode === 'edit' && UI.sel.kind === 'room' && UI.sel.id === id) || UI.mode === 'sketch') && typeof startRoomDrag === 'function') {
     const r = roomById(id); UI.sel = { kind: 'room', id }; drag.type = 'room'; Object.assign(drag, startRoomDrag(r, w)); refreshAll(true);
   } else { drag.type = 'pan'; }
 }
@@ -986,6 +1054,7 @@ function onMove(e) {
     const nz = clamp(pinch.z0 * dd / pinch.d0, CONFIG.zoomMin, CONFIG.zoomMax), mx = (a.x + b.x) / 2 - rc.left, my = (a.y + b.y) / 2 - rc.top;
     UI.view.z = nz; UI.view.x = pinch.w[0] - mx / nz; UI.view.y = pinch.w[1] - my / nz; render(); return;
   }
+  if (UI.mode === 'sketch' && typeof sketchHover === 'function') sketchHover(e, [wx, wy]);
   if (!drag) return;
   const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
   if (!drag.moved && Math.hypot(dx, dy) < 4) return;
@@ -1005,12 +1074,14 @@ function onMove(e) {
     case 'handle': dragHandle(drag, w); render(); break;
     case 'light': { const l = S.lights.find(q => q.id === drag.id); if (l) { l.x = gsnap(w[0] + drag.off[0]); l.y = gsnap(w[1] + drag.off[1]); } render(); break; }
     case 'room': dragRoomMove(drag, w); render(); break;
+    default: if (typeof sketchDragMove === 'function') sketchDragMove(drag, w, e);
   }
 }
 function onUp(e) {
   ptrs.delete(e.pointerId);
   if (pinch) { if (ptrs.size < 2) pinch = null; if (ptrs.size === 0) drag = null; return; }
   const d = drag; drag = null; if (!d) return;
+  if (d.type && d.type.startsWith('sk') && typeof sketchUp === 'function') { sketchUp(d, e); return; }
   if (d.moved) {
     if (d.type !== 'pan') commit();
     saveUI(); return;
@@ -1036,6 +1107,7 @@ document.addEventListener('keydown', e => {
   const inField = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''));
   if (e.code === 'Space' && !inField) { UI.space = true; svg.classList.add('pan'); e.preventDefault(); return; }
   if (inField) return;
+  if (UI.mode === 'sketch' && typeof sketchKey === 'function' && sketchKey(e)) return;
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
   else if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
@@ -1064,7 +1136,9 @@ const FIX_DEFS = {
   art: { label: 'Wall art / portrait', len: 30, name: 'Wall art' },
   fireplace: { label: 'Corner stone fireplace', corner: true, a: 60, b: 28, name: 'Stone fireplace' },
   angledDoor: { label: 'Angled corner door', corner: true, a: 30, b: 30, len: 36, swing: 'out', hinge: 'start', name: 'Angled door' },
-  angledWindow: { label: 'Angled corner window', corner: true, a: 30, b: 30, len: 30, name: 'Angled window' }
+  angledWindow: { label: 'Angled corner window', corner: true, a: 30, b: 30, len: 30, name: 'Angled window' },
+  angledOpening: { label: 'Angled corner opening (no door)', corner: true, a: 30, b: 30, len: 36, name: 'Angled opening' },
+  windowC: { type: 'window', label: 'Window with curtain', len: 36, curtain: true, name: 'Window + curtain' }
 };
 function targetRoom() {
   if (UI.sel.kind === 'room') return roomById(UI.sel.id);
@@ -1081,7 +1155,7 @@ function addFixture(key) {
     if (!free) { toast('No free corner in ' + r.name); return; }
     Object.assign(f, { corner: free, a: def.a, b: def.b }); if (def.len) f.len = def.len; if (def.swing) { f.swing = def.swing; f.hinge = def.hinge; }
   } else {
-    Object.assign(f, { len: def.len }); if (def.depth) f.depth = def.depth; if (def.swing) { f.swing = def.swing; f.hinge = def.hinge; } if (def.blinds) f.blinds = true;
+    Object.assign(f, { len: def.len }); if (def.depth) f.depth = def.depth; if (def.swing) { f.swing = def.swing; f.hinge = def.hinge; } if (def.blinds) f.blinds = true; if (def.curtain) f.curtain = true;
     let placed = false;
     for (const wall of ['top', 'right', 'bottom', 'left']) {
       const [lo, hi] = wallRange(r, wall);
@@ -1099,13 +1173,21 @@ function addPiece(type) {
   const t = PIECES[type], r = targetRoom(); if (!r) return;
   const p = { id: uid('p_'), type, name: t.label, x: r.x + r.w / 2, y: r.y + r.d / 2, w: t.w, d: t.d, rot: 0 };
   if (t.mountable) p.wallMount = false;
-  // nudge to a free spot
-  const tryPos = []; for (let k = 0; k < 40; k++) tryPos.push([r.x + r.w / 2 + (k % 5 - 2) * 30, r.y + r.d / 2 + (Math.floor(k / 5) - 4) * 24]);
+  // nudge to a free spot inside the room, nearest to the centre first (small sketched rooms included)
+  const tryPos = []; for (let k = 0; k < 45; k++) tryPos.push([r.x + r.w / 2 + (k % 5 - 2) * 30, r.y + r.d / 2 + (Math.floor(k / 5) - 4) * 24]);
+  const cx = r.x + r.w / 2, cy = r.y + r.d / 2, inR = q => q[0] > r.x && q[0] < r.x + r.w && q[1] > r.y && q[1] < r.y + r.d && (typeof roomAt !== 'function' || roomAt(q[0], q[1]) === r);
+  tryPos.sort((a, b) => Math.hypot(a[0] - cx, a[1] - cy) - Math.hypot(b[0] - cx, b[1] - cy));
+  const inside = tryPos.filter(inR); if (inside.length) tryPos.splice(0, tryPos.length, ...inside);
   for (const q of tryPos) { p.x = gsnapSafe(q[0]); p.y = gsnapSafe(q[1]); if (!S.pieces.some(o => o.type !== 'rug' && polysIntersect(piecePoly(p), piecePoly(o), 1))) break; }
   S.pieces.push(p); UI.sel = { kind: 'piece', id: p.id }; if (UI.mode !== 'furniture') setMode('furniture'); commit();
 }
 const gsnapSafe = v => UI.snap ? snapTo(v, UI.grid) : v;
-function setMode(m) { UI.mode = m; $('#mFurn').classList.toggle('on', m === 'furniture'); $('#mEdit').classList.toggle('on', m === 'edit'); refreshAll(); }
+function setMode(m) {
+  if (UI.mode === 'sketch' && m !== 'sketch' && typeof sketchLeave === 'function') sketchLeave();
+  UI.mode = m; $('#mFurn').classList.toggle('on', m === 'furniture'); $('#mEdit').classList.toggle('on', m === 'edit'); const ms = $('#mSketch'); if (ms) ms.classList.toggle('on', m === 'sketch');
+  if (UI.sel.kind === 'skwall' && m !== 'sketch') UI.sel = { kind: null, id: null };
+  document.body.classList.toggle('sketching', m === 'sketch'); refreshAll();
+}
 function numInput(prop, v, step = 1, min = '', max = '') { return `<input type="number" data-p="${prop}" value="${rnd1(v)}" step="${step}" ${min !== '' ? `min="${min}"` : ''} ${max !== '' ? `max="${max}"` : ''}>`; }
 function relXY(x, y) { const r = roomAt(x, y); return r ? { x: x - r.x, y: y - r.y, r } : { x, y, r: null }; }
 function selectionHTML() {
@@ -1130,14 +1212,14 @@ function selectionHTML() {
     <div class="small">Type: <b>${esc(f.type)}</b> · in ${esc(r.name)}</div>
     ${f.corner ? `<div class="row"><label>Corner</label><select data-f="corner">${CORNERS.map(c => `<option ${f.corner === c ? 'selected' : ''} value="${c}">${{ tl: 'top-left', tr: 'top-right', br: 'bottom-right', bl: 'bottom-left' }[c]}</option>`).join('')}</select></div>
       <div class="grid2"><div class="row"><label>Leg A″</label>${numInput('a', f.a, 1, 6).replace('data-p', 'data-f')}</div><div class="row"><label>Leg B″</label>${numInput('b', f.b, 1, 6).replace('data-p', 'data-f')}</div></div>
-      ${f.len != null ? `<div class="row"><label>${isDoor ? 'Door' : 'Window'} width″</label>${numInput('len', f.len, 1, 6).replace('data-p', 'data-f')}<span class="small">on a ${rnd1(Math.hypot(f.a, f.b))}″ diagonal</span></div>` : ''}`
+      ${f.len != null ? `<div class="row"><label>${isDoor ? 'Door' : /opening/i.test(f.type) ? 'Opening' : 'Window'} width″</label>${numInput('len', f.len, 1, 6).replace('data-p', 'data-f')}<span class="small">on a ${rnd1(Math.hypot(f.a, f.b))}″ diagonal</span></div>` : ''}`
       : `<div class="row"><label>Wall</label><select data-f="wall">${['top', 'right', 'bottom', 'left'].map(w => `<option ${f.wall === w ? 'selected' : ''}>${w}</option>`).join('')}</select></div>
       <div class="grid2"><div class="row"><label>From start″</label>${numInput('pos', f.pos).replace('data-p', 'data-f')}</div><div class="row"><label>Length″</label>${numInput('len', f.len, 1, 4).replace('data-p', 'data-f')}</div>
       ${f.depth != null ? `<div class="row"><label>Depth″</label>${numInput('depth', f.depth, 1, 1).replace('data-p', 'data-f')}</div>` : ''}</div>
       <div class="small">Position is measured along the wall from the room's top-left corner side.</div>`}
     ${isDoor ? `<div class="row"><label>Swing</label><select data-f="swing"><option ${f.swing !== 'out' ? 'selected' : ''} value="in">into room</option><option ${f.swing === 'out' ? 'selected' : ''} value="out">out of room</option></select><select data-f="hinge"><option value="start" ${f.hinge !== 'end' ? 'selected' : ''}>hinge at start</option><option value="end" ${f.hinge === 'end' ? 'selected' : ''}>hinge at end</option></select></div>
       <div class="row"><label>Entrance</label><input type="checkbox" data-f="entry" ${f.entry ? 'checked' : ''}> <span class="small">front door (used for feng shui)</span></div>` : ''}
-    ${f.type === 'window' ? `<div class="row"><label>Blinds</label><input type="checkbox" data-f="blinds" ${f.blinds ? 'checked' : ''}></div>` : ''}
+    ${f.type === 'window' ? `<div class="row"><label>Blinds</label><input type="checkbox" data-f="blinds" ${f.blinds ? 'checked' : ''}><label style="min-width:auto"><input type="checkbox" data-f="curtain" ${f.curtain ? 'checked' : ''}> curtain</label></div>` : ''}
     <div class="row"><button data-act="dup">Duplicate</button><button class="danger" data-act="del">Delete</button></div>`;
   }
   if (k === 'light') {
@@ -1165,7 +1247,7 @@ function bindSelection() {
     } else if (t.dataset.f !== undefined) {
       const h = findFixture(UI.sel.id); if (!h) return; const f = h.f, key = t.dataset.f; let v = t.type === 'checkbox' ? t.checked : t.value;
       if (['pos', 'len', 'depth', 'a', 'b'].includes(key)) { v = parseFloat(v); if (isNaN(v)) return; }
-      if (key === 'corner') { const cuts = cornerCuts(h.r); if ((f.type === 'angledDoor' || f.type === 'angledWindow') && cuts[v] && cuts[v].fid !== f.id) { toast('That corner is already cut'); return; } }
+      if (key === 'corner') { const cuts = cornerCuts(h.r); if (isCutFix(f) && cuts[v] && cuts[v].fid !== f.id) { toast('That corner is already cut'); return; } }
       f[key] = v;
       if (key === 'wall') { const [lo, hi] = wallRange(h.r, v); f.pos = clamp(f.pos, lo, Math.max(lo, hi - f.len)); }
       if (key === 'entry' && v) S.rooms.forEach(r => r.fixtures.forEach(x => { if (x !== f) x.entry = false; }));
@@ -1204,7 +1286,7 @@ function updateStatus() {
   const c = UI.cursor, st = $('#status'); let loc = '';
   if (c) { const r = roomAt(c[0], c[1]); loc = r ? `<span>${esc(r.name)} <b>x ${Math.round(c[0] - r.x)}″ · y ${Math.round(c[1] - r.y)}″</b></span>` : `<span>plan <b>x ${Math.round(c[0])}″ · y ${Math.round(c[1])}″</b></span>`; }
   const tot = S.rooms.reduce((a, r) => a + roomSqft(r), 0);
-  st.innerHTML = `${loc}<span>zoom <b>${UI.view.z.toFixed(2)}×</b></span><span>snap <b>${UI.snap ? UI.grid + '″' : 'off'}</b></span><span>mode <b>${UI.mode === 'edit' ? 'Edit Room' : 'Furniture'}</b></span><span>total <b id="totSqft">${Math.round(tot * 10) / 10} sq ft</b></span>`;
+  st.innerHTML = `${loc}<span>zoom <b>${UI.view.z.toFixed(2)}×</b></span><span>snap <b>${UI.snap ? UI.grid + '″' : 'off'}</b></span><span>mode <b>${UI.mode === 'edit' ? 'Edit Room' : UI.mode === 'sketch' ? 'Sketch' : 'Furniture'}</b></span><span>total <b id="totSqft">${Math.round(tot * 10) / 10} sq ft</b></span>`;
 }
 function renderRoomCard() { $('#roomBody').innerHTML = roomCardHTML ? roomCardHTML() : ''; }
 let roomCardHTML = null;
@@ -1223,13 +1305,13 @@ function refreshAll(light) {
   $('#btnUndo').disabled = hist.idx <= 0; $('#btnRedo').disabled = hist.idx >= hist.stack.length - 1;
   $('#btnLight').classList.toggle('on', UI.light);
   $('#aboutPlan').innerHTML = `${esc(CONFIG.home.address)} · ${CONFIG.home.sqft.toLocaleString()} sq ft ${esc(CONFIG.home.type)}; ${esc(CONFIG.home.note)}.<br>Room dimensions and fixture positions are <b>estimates</b> (the angled bedroom door is a guess) – edit them in <b>Edit Room</b> mode.`;
-  $('#hint').textContent = UI.mode === 'edit' ? 'Edit Room: drag a fixture along a wall, drag its blue handles to resize; corner items snap to corners.' : 'Furniture: drag pieces · double-tap to rotate · drag background / Space+drag to pan · wheel or pinch to zoom';
+  $('#hint').textContent = UI.mode === 'sketch' && typeof sketchHint === 'function' ? sketchHint() : UI.mode === 'edit' ? 'Edit Room: drag a fixture along a wall, drag its blue handles to resize; corner items snap to corners.' : 'Furniture: drag pieces · double-tap to rotate · drag background / Space+drag to pan · wheel or pinch to zoom';
   panelHooks.forEach(h => h());
 }
 /* ====================== IMPORT / EXPORT ====================== */
 function serializePlan() {
   const o = { app: 'room-planner', version: CONFIG.exportVersion, appVersion: CONFIG.appVersion, exportedAt: new Date().toISOString(), title: S.title,
-    rooms: clone(S.rooms), openPairs: clone(S.openPairs), pieces: clone(S.pieces), lights: clone(S.lights), vibe: clone(S.vibe), feng: clone(S.feng),
+    rooms: clone(S.rooms), openPairs: clone(S.openPairs), sketchWalls: clone(S.sketchWalls || []), pieces: clone(S.pieces), lights: clone(S.lights), vibe: clone(S.vibe), feng: clone(S.feng),
     settings: { snap: UI.snap, grid: UI.grid } };
   if (S.reasoning) o.reasoning = clone(S.reasoning);
   if (typeof reasoningForExport === 'function') o.reasoningDetail = reasoningForExport();
@@ -1240,13 +1322,14 @@ function migratePlan(o) {
   if (!o || typeof o !== 'object') throw new Error('Not a plan file');
   if (typeof o.version === 'number' && o.version > CONFIG.exportVersion) throw new Error('This file is version ' + o.version + ' – newer than this planner supports (v' + CONFIG.exportVersion + ')');
   let rooms;
-  if (Array.isArray(o.rooms) && o.rooms.length) rooms = o.rooms.map((r, i) => Object.assign(newRoom({}), clone(r), { id: r.id || (i ? uid('r_') : 'r1') }));
+  if (Array.isArray(o.rooms) && (o.rooms.length || (!o.room && Array.isArray(o.sketchWalls)))) rooms = o.rooms.map((r, i) => Object.assign(newRoom({}), clone(r), { id: r.id || (i ? uid('r_') : 'r1') }));
   else if (o.room && typeof o.room === 'object') { rooms = [Object.assign(newRoom({}), clone(o.room), { id: 'r1', x: o.room.x || 0, y: o.room.y || 0, type: o.room.type || 'living' })]; }
   else throw new Error('Missing rooms');
   if (!Array.isArray(o.pieces)) throw new Error('Missing pieces');
   rooms.forEach(r => { r.fixtures = (r.fixtures || []).map(f => Object.assign({ id: uid('f_') }, f)); r.wallLabels = r.wallLabels || {}; });
   const P = basePlan(rooms, clone(o.pieces).map(p => Object.assign({ id: uid('p_'), rot: 0 }, p)), clone(o.lights || []));
   P.openPairs = Array.isArray(o.openPairs) ? clone(o.openPairs) : [];
+  P.sketchWalls = Array.isArray(o.sketchWalls) ? o.sketchWalls.filter(w => w && Array.isArray(w.a) && Array.isArray(w.b) && [w.a[0], w.a[1], w.b[0], w.b[1]].every(Number.isFinite)).map(w => ({ id: w.id || uid('w_'), a: [w.a[0], w.a[1]], b: [w.b[0], w.b[1]] })) : [];
   if (o.vibe) P.vibe = Object.assign(P.vibe, clone(o.vibe));
   if (o.feng) P.feng = Object.assign(P.feng, clone(o.feng));
   if (o.reasoning) P.reasoning = clone(o.reasoning);
@@ -1256,7 +1339,7 @@ function migratePlan(o) {
 function importPlan(o, opts = {}) {
   const P = migratePlan(o);
   S = P; if (o.settings) { if (typeof o.settings.snap === 'boolean') UI.snap = o.settings.snap; if (o.settings.grid && CONFIG.gridChoices.includes(o.settings.grid)) UI.grid = o.settings.grid; }
-  UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0].id;
+  UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0] ? S.rooms[0].id : null;
   if (!opts.silent) { commit(); fitAll(); }
 }
 function downloadText(name, text, mime = 'application/json') {
@@ -1269,7 +1352,7 @@ function initUI() {
   $('#selGrid').onchange = e => { UI.grid = +e.target.value; saveUI(); refreshAll(); };
   $('#btnSnap').onclick = () => { UI.snap = !UI.snap; $('#btnSnap').classList.toggle('on', UI.snap); saveUI(); refreshAll(); };
   $('#btnSnap').classList.toggle('on', UI.snap);
-  $('#mFurn').onclick = () => setMode('furniture'); $('#mEdit').onclick = () => setMode('edit');
+  $('#mFurn').onclick = () => setMode('furniture'); $('#mEdit').onclick = () => setMode('edit'); if ($('#mSketch')) $('#mSketch').onclick = () => setMode('sketch');
   $('#btnUndo').onclick = undo; $('#btnRedo').onclick = redo; $('#btnRot').onclick = rotateSelected;
   $('#btnAddFix').onclick = e => showMenu(e.currentTarget, Object.keys(FIX_DEFS).map(k => ({ label: FIX_DEFS[k].label, fn: () => addFixture(k) })));
   $('#btnAddPiece').onclick = e => showMenu(e.currentTarget, Object.keys(PIECES).map(k => ({ label: PIECES[k].label + ' (' + PIECES[k].w + '×' + PIECES[k].d + '″)', fn: () => addPiece(k) })));
@@ -1589,7 +1672,7 @@ function addRoom(key) {
   const target = targetRoom() || S.rooms[0];
   const proto = newRoom({ name: pre.name, type: pre.type, w: pre.w, d: pre.d, shape: pre.shape || 'rect', notch: pre.notch ? clone(pre.notch) : null });
   const n = S.rooms.filter(r => r.type === pre.type).length; if (n) proto.name = pre.name + ' ' + (n + 1);
-  const [x, y] = findFreeSpot(proto, target); proto.x = x; proto.y = y;
+  const [x, y] = target ? findFreeSpot(proto, target) : [0, 0]; proto.x = x; proto.y = y;
   S.rooms.push(proto); UI.sel = { kind: 'room', id: proto.id }; UI.curRoom = proto.id; commit(); fitAll(); toast('Added ' + proto.name + ' (' + fmtIn(proto.w) + '×' + fmtIn(proto.d) + ')');
 }
 function neighbors(r) { // rooms sharing a wall segment of >= 6in
@@ -1611,7 +1694,7 @@ function isOpen(a, b) { return S.openPairs.includes(pairKey(a, b)); }
 function connections() { // doors/openings that lead into another room
   const out = [];
   for (const r of S.rooms) for (const f of r.fixtures) {
-    if (!['door', 'opening', 'slider', 'angledDoor'].includes(f.type)) continue;
+    if (!['door', 'opening', 'slider', 'angledDoor', 'angledOpening'].includes(f.type)) continue;
     const g = gapBasis(r, f), m = V.mul(V.add(g.a, g.b), .5), q = V.add(m, V.mul(g.n, -8));
     const o = S.rooms.find(x => x.id !== r.id && pointInPoly(q, roomPoly(x)));
     if (o) out.push({ a: r.id, b: o.id, f });
@@ -1678,7 +1761,7 @@ function deleteRoomConfirm(id) {
     S.pieces = S.pieces.filter(p => !pointInPoly([p.x, p.y], roomPoly(r)));
     S.lights = S.lights.filter(l => !pointInPoly([l.x, l.y], roomPoly(r)));
     S.rooms = S.rooms.filter(x => x.id !== id); S.openPairs = S.openPairs.filter(k => !k.split('|').includes(id));
-    UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0].id; commit();
+    UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0] ? S.rooms[0].id : null; commit();
   });
 }
 function duplicateRoom(id) {
@@ -1744,6 +1827,656 @@ function bindRoomCard() {
   };
 }
 
+/* ---- 62-sketch.js ---- */
+/* ====================== SKETCH MODE ====================== */
+// Rough out a house: drag rectangles into rooms, click wall polylines (closed loops become rooms), move/resize/rename/erase.
+// Rooms made here are ordinary rooms (newRoom) so Furniture + Edit Room mode work on them unchanged.
+UI.sk = { tool: 'select', pts: [], preview: null, hover: null, cursor: null, shift: false };
+const SK_TOOLS = { select: '↖ Select / move', room: '▭ Draw room', walls: '✎ Draw walls', erase: '⌫ Eraser' };
+const SK_DISMISS_KEY = 'roomPlanner.skStartDismissed';
+function skWalls() { if (!Array.isArray(S.sketchWalls)) S.sketchWalls = []; return S.sketchWalls; }
+function sketchHint() {
+  const t = UI.sk.tool;
+  if (t === 'room') return 'Draw room: drag a rectangle (snaps to the grid and to other rooms). Rooms may touch but not overlap.';
+  if (t === 'walls') return UI.sk.pts.length ? 'Draw walls: click the next corner · click the first point to close a room · double-click / Enter to finish · Backspace removes a point · Esc cancels · Shift = any angle' : 'Draw walls: click to place corners (straight walls by default, Shift = any angle). A closed loop becomes a room; open walls stay as sketch walls.';
+  if (t === 'erase') return 'Eraser: tap a room or sketch wall to delete it (Ctrl+Z undoes).';
+  return 'Sketch: drag a room to move it, drag the yellow handles to resize, double-click to rename. Then switch to Furniture to furnish it.';
+}
+function setSketchTool(t) {
+  if (!SK_TOOLS[t]) return; UI.sk.tool = t; UI.sk.pts = []; UI.sk.preview = null;
+  if (t !== 'select' && UI.sel.kind !== 'room') UI.sel = { kind: null, id: null };
+  syncSketchBar(); refreshAll();
+}
+function sketchLeave() { UI.sk.pts = []; UI.sk.preview = null; }
+function skThreshold() { return Math.max(4, 12 / UI.view.z); }
+function skSnapPt(w, opts = {}) {
+  // 1) existing wall/room corners and sketch-wall endpoints, 2) neighbour room edges, 3) grid (honours the Snap toggle)
+  const T = skThreshold(); let best = null;
+  const cand = [];
+  for (const sw of skWalls()) cand.push(sw.a, sw.b);
+  for (const r of S.rooms) cand.push([r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.d], [r.x + r.w, r.y + r.d]);
+  if (opts.extra) cand.push(...opts.extra);
+  for (const c of cand) { const d = Math.hypot(c[0] - w[0], c[1] - w[1]); if (d <= T && (!best || d < best.d)) best = { d, p: [c[0], c[1]] }; }
+  if (best) return best.p;
+  return [edgeSnap(w[0], 'x', null), edgeSnap(w[1], 'y', null)];
+}
+function nextRoomName() { let n = S.rooms.length + 1; const names = new Set(S.rooms.map(r => r.name)); while (names.has('Room ' + n)) n++; return 'Room ' + n; }
+function rectFrom(a, b) { return { x: Math.min(a[0], b[0]), y: Math.min(a[1], b[1]), w: Math.abs(b[0] - a[0]), d: Math.abs(b[1] - a[1]) }; }
+// create a normal room from a rect (+ optional L notch). Returns the room or null (with a toast saying why).
+function sketchMakeRoom(rc, extra = {}, quiet) {
+  const M = CONFIG.minRoom;
+  if (rc.w < M || rc.d < M) { if (!quiet) toast(`Too small – rooms need at least ${fmtIn(M)} × ${fmtIn(M)}`); return null; }
+  if (rc.w > CONFIG.maxRoom || rc.d > CONFIG.maxRoom) { if (!quiet) toast('Too big – max ' + fmtIn(CONFIG.maxRoom) + ' per side'); return null; }
+  const r = newRoom(Object.assign({ name: extra.name || nextRoomName(), type: extra.type || 'room', x: rnd1(rc.x), y: rnd1(rc.y), w: rnd1(rc.w), d: rnd1(rc.d), fixtures: [], wallLabels: {}, sketch: true }, extra.shape ? { shape: extra.shape, notch: extra.notch } : {}));
+  if (S.rooms.some(o => roomsOverlap(r, o))) { if (!quiet) toast('That room would overlap an existing room – rooms can share walls but not overlap'); return null; }
+  return r;
+}
+function sketchAddRoom(r) { S.rooms.push(r); UI.sel = { kind: 'room', id: r.id }; UI.curRoom = r.id; }
+function sketchDeleteRoom(id) {
+  const r = roomById(id); if (!r) return; const P = roomPoly(r);
+  S.pieces = S.pieces.filter(p => !pointInPoly([p.x, p.y], P)); S.lights = S.lights.filter(l => !pointInPoly([l.x, l.y], P));
+  S.rooms = S.rooms.filter(x => x.id !== id); S.openPairs = S.openPairs.filter(k => !k.split('|').includes(id));
+  if (UI.sel.id === id) UI.sel = { kind: null, id: null }; if (UI.curRoom === id) UI.curRoom = S.rooms[0] ? S.rooms[0].id : null;
+  commit(); toast('Deleted ' + r.name + ' – Ctrl+Z / ↶ to undo');
+}
+/* ---- polygon -> room (best effort) ---- */
+function cleanPoly(P) {
+  let Q = []; for (const p of P) { const l = Q[Q.length - 1]; if (!l || Math.hypot(l[0] - p[0], l[1] - p[1]) > 0.5) Q.push([p[0], p[1]]); }
+  if (Q.length > 1 && Math.hypot(Q[0][0] - Q[Q.length - 1][0], Q[0][1] - Q[Q.length - 1][1]) <= 0.5) Q.pop();
+  let changed = true;
+  while (changed && Q.length > 3) { changed = false; for (let i = 0; i < Q.length; i++) { const a = Q[(i - 1 + Q.length) % Q.length], b = Q[i], c = Q[(i + 1) % Q.length]; const cr = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]); if (Math.abs(cr) < 0.5) { Q.splice(i, 1); changed = true; break; } } }
+  return Q;
+}
+function polyToRoomSpec(P) { // -> {rc, shape?, notch?, note?}
+  const Q = cleanPoly(P); if (Q.length < 3) return null;
+  const xs = Q.map(p => p[0]), ys = Q.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const rc = { x: x0, y: y0, w: x1 - x0, d: y1 - y0 };
+  const axis = Q.every((p, i) => { const q = Q[(i + 1) % Q.length]; return Math.abs(p[0] - q[0]) < 0.5 || Math.abs(p[1] - q[1]) < 0.5; });
+  if (axis && Q.length === 4) return { rc };
+  if (axis && Q.length === 6) {
+    const on = (v, a, b) => Math.abs(v - a) < .5 || Math.abs(v - b) < .5;
+    const corners = { tl: [x0, y0], tr: [x1, y0], br: [x1, y1], bl: [x0, y1] };
+    const missing = Object.keys(corners).filter(k => !Q.some(p => Math.hypot(p[0] - corners[k][0], p[1] - corners[k][1]) < .5));
+    const inner = Q.filter(p => !on(p[0], x0, x1) && !on(p[1], y0, y1));
+    if (missing.length === 1 && inner.length === 1) {
+      const c = corners[missing[0]], a = Math.abs(inner[0][0] - c[0]), b = Math.abs(inner[0][1] - c[1]);
+      if (a >= 12 && b >= 12 && a <= rc.w - 12 && b <= rc.d - 12) return { rc, shape: 'L', notch: { corner: missing[0], a: rnd1(a), b: rnd1(b) } };
+    }
+  }
+  return { rc, note: axis ? 'That outline has more corners than a rectangle or L – it became its bounding rectangle. Adjust it in Edit Room mode.' : 'Angled walls are not supported for rooms – the outline became its bounding rectangle.' };
+}
+/* ---- sketch walls graph: closed loops -> rooms ---- */
+const skKey = p => Math.round(p[0] * 2) / 2 + ',' + Math.round(p[1] * 2) / 2;
+function sketchConvertLoops() {
+  const W = skWalls(), adj = new Map(); let made = 0;
+  W.forEach((w, i) => { for (const k of [skKey(w.a), skKey(w.b)]) { if (!adj.has(k)) adj.set(k, []); adj.get(k).push(i); } });
+  const seen = new Set(), remove = new Set();
+  for (let i = 0; i < W.length; i++) {
+    if (seen.has(i)) continue;
+    const comp = [], st = [i]; seen.add(i);
+    while (st.length) { const j = st.pop(); comp.push(j); for (const k of [skKey(W[j].a), skKey(W[j].b)]) for (const n of adj.get(k)) if (!seen.has(n)) { seen.add(n); st.push(n); } }
+    if (comp.length < 3) continue;
+    const nodes = new Set(); comp.forEach(j => { nodes.add(skKey(W[j].a)); nodes.add(skKey(W[j].b)); });
+    if (![...nodes].every(k => adj.get(k).filter(j => comp.includes(j)).length === 2)) continue;
+    // walk the loop
+    const P = [W[comp[0]].a.slice()], used = new Set([comp[0]]); let cur = W[comp[0]].b;
+    while (used.size < comp.length) { P.push(cur.slice()); const nx = adj.get(skKey(cur)).find(j => comp.includes(j) && !used.has(j)); if (nx == null) break; used.add(nx); cur = skKey(W[nx].a) === skKey(cur) ? W[nx].b : W[nx].a; }
+    const spec = polyToRoomSpec(P); if (!spec) continue;
+    const r = sketchMakeRoom(spec.rc, spec.shape ? { shape: spec.shape, notch: spec.notch } : {});
+    if (!r) continue; // toast already explains; walls stay as sketch walls
+    sketchAddRoom(r); comp.forEach(j => remove.add(j)); made++;
+    if (spec.note) setTimeout(() => toast(spec.note, 4200), 50);
+    else toast('Closed walls → ' + r.name + ' (' + fmtIn(r.w) + ' × ' + fmtIn(r.d) + (r.shape === 'L' ? ', L-shaped' : '') + ')');
+  }
+  if (remove.size) S.sketchWalls = W.filter((w, i) => !remove.has(i));
+  return made;
+}
+function sketchFinishWalls() {
+  const pts = UI.sk.pts; UI.sk.pts = []; UI.sk.preview = null;
+  if (pts.length < 2) { refreshAll(); return; }
+  const W = skWalls();
+  for (let i = 0; i + 1 < pts.length; i++) if (Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]) > 0.5) W.push({ id: uid('w_'), a: pts[i].slice(), b: pts[i + 1].slice() });
+  const made = sketchConvertLoops();
+  if (!made) toast('Walls kept as sketch walls – close the loop (click the first point) to make a room');
+  commit();
+}
+function sketchWallPoint(w, shift) {
+  const pts = UI.sk.pts, L = pts[pts.length - 1];
+  let p = w.slice();
+  if (L && !shift) { if (Math.abs(p[0] - L[0]) >= Math.abs(p[1] - L[1])) p[1] = L[1]; else p[0] = L[0]; }
+  const first = pts[0];
+  if (first && pts.length >= 3 && Math.hypot(w[0] - first[0], w[1] - first[1]) <= Math.max(8, 16 / UI.view.z)) return { p: first.slice(), close: true };
+  const s = skSnapPt(p);
+  if (L && !shift) { if (p[1] === L[1]) s[1] = L[1]; else s[0] = L[0]; }
+  return { p: s, close: false };
+}
+/* ---- pointer hooks (called from 30-interact.js) ---- */
+function sketchDown(e, drag, t) {
+  const tool = UI.sk.tool, kind = drag.kind;
+  if (tool === 'select') {
+    if (kind === 'skwall') { drag.type = 'skwallmv'; drag.wall0 = clone(skWalls().find(w => w.id === drag.id) || null); return true; }
+    return false; // rooms / handles / pan handled by the normal Edit-Room code paths
+  }
+  if (kind === 'handle') return false;
+  if (tool === 'room') { drag.type = 'skroom'; drag.a = skSnapPt(drag.w0); return true; }
+  if (tool === 'walls') { drag.type = 'skpt'; return true; }
+  if (tool === 'erase') { drag.type = 'skerase'; return true; }
+  return false;
+}
+function sketchHover(e, w) {
+  UI.sk.cursor = w; UI.sk.shift = !!e.shiftKey;
+  if (UI.sk.tool === 'walls' && UI.sk.pts.length && !drag) { UI.sk.preview = sketchWallPoint(w, e.shiftKey).p; render(); }
+}
+function sketchDragMove(d, w, e) {
+  if (d.type === 'skroom') { const b = skSnapPt(w); d.b = b; UI.sk.preview = rectFrom(d.a, b); render(); return; }
+  if (d.type === 'skwallmv' && d.wall0) {
+    const wl = skWalls().find(x => x.id === d.id); if (!wl) return;
+    const dx = gsnap(w[0] - d.w0[0]), dy = gsnap(w[1] - d.w0[1]);
+    wl.a = [d.wall0.a[0] + dx, d.wall0.a[1] + dy]; wl.b = [d.wall0.b[0] + dx, d.wall0.b[1] + dy]; render(); return;
+  }
+  if (d.type === 'skpt' || d.type === 'skerase') { // a drag with these tools pans the view
+    const v0 = d.view0; UI.view.x = v0.x - (e.clientX - d.sx) / v0.z; UI.view.y = v0.y - (e.clientY - d.sy) / v0.z; render();
+  }
+}
+function sketchUp(d, e) {
+  if (d.type === 'skroom') {
+    UI.sk.preview = null;
+    if (!d.moved || !d.b) { if (d.kind === 'room') { UI.sel = { kind: 'room', id: d.id }; UI.curRoom = d.id; } else toast('Drag to draw a room'); refreshAll(); return; }
+    const r = sketchMakeRoom(rectFrom(d.a, d.b));
+    if (r) { sketchAddRoom(r); commit(); toast('Added ' + r.name + ' (' + fmtIn(r.w) + ' × ' + fmtIn(r.d) + ') – double-click to rename'); }
+    else refreshAll();
+    return;
+  }
+  if (d.type === 'skwallmv') { if (d.moved) commit(); else { UI.sel = { kind: 'skwall', id: d.id }; refreshAll(); } return; }
+  if (d.type === 'skpt') {
+    if (d.moved) { saveUI(); return; }
+    const w = evWorld(e), r = sketchWallPoint(w, e.shiftKey), pts = UI.sk.pts, L = pts[pts.length - 1];
+    if (r.close) { pts.push(r.p); sketchFinishWalls(); return; }
+    if (L && Math.hypot(L[0] - r.p[0], L[1] - r.p[1]) < 0.5) { if (pts.length >= 2 && !e.__dbl) { /* tapping the last point again finishes */ sketchFinishWalls(); } return; }
+    pts.push(r.p); UI.sk.preview = null; syncSketchBar(); refreshAll(); return;
+  }
+  if (d.type === 'skerase') {
+    if (d.moved) return;
+    if (d.kind === 'skwall') { S.sketchWalls = skWalls().filter(w => w.id !== d.id); commit(); toast('Sketch wall erased'); return; }
+    if (d.kind === 'room') { sketchDeleteRoom(d.id); return; }
+    toast('Tap a room or a sketch wall to erase it'); return;
+  }
+}
+function sketchKey(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return false;
+  const k = e.key;
+  if (UI.sk.tool === 'walls' && UI.sk.pts.length) {
+    if (k === 'Enter') { sketchFinishWalls(); e.preventDefault(); return true; }
+    if (k === 'Escape') { UI.sk.pts = []; UI.sk.preview = null; syncSketchBar(); refreshAll(); toast('Wall drawing cancelled'); return true; }
+    if (k === 'Backspace') { UI.sk.pts.pop(); syncSketchBar(); refreshAll(); e.preventDefault(); return true; }
+  }
+  const map = { v: 'select', b: 'room', w: 'walls', e: 'erase' };
+  if (map[k.toLowerCase()] && k.length === 1) { setSketchTool(map[k.toLowerCase()]); return true; }
+  if (k === 'Escape' && UI.sk.tool !== 'select') { setSketchTool('select'); return true; }
+  return false;
+}
+/* ---- drawing overlay ---- */
+function sketchOverlay() {
+  const z = UI.view.z, fs = fsz(), pal = palette(), on = UI.mode === 'sketch'; let o = '';
+  for (const w of skWalls()) {
+    const sel = on && UI.sel.kind === 'skwall' && UI.sel.id === w.id, L = Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]);
+    o += `<g ${on ? `data-kind="skwall" data-id="${w.id}" class="skw"` : 'pointer-events="none"'}><line x1="${rnd1(w.a[0])}" y1="${rnd1(w.a[1])}" x2="${rnd1(w.b[0])}" y2="${rnd1(w.b[1])}" stroke="${sel ? '#ffd479' : pal.wall}" stroke-width="${CONFIG.wall}" stroke-linecap="square" opacity="${on ? .95 : .55}" stroke-dasharray="${on ? '0' : '6 4'}"/>`
+      + (on ? `<line x1="${rnd1(w.a[0])}" y1="${rnd1(w.a[1])}" x2="${rnd1(w.b[0])}" y2="${rnd1(w.b[1])}" stroke="transparent" stroke-width="${rnd1(Math.max(10, 18 / z))}" pointer-events="stroke"/>` : '') + '</g>';
+    if (on && L > 12) o += textHalo((w.a[0] + w.b[0]) / 2, (w.a[1] + w.b[1]) / 2 - fs * .5, fmtIn(L), fs * .85, { fill: '#ffd479' });
+  }
+  if (!on) return o;
+  // dimensions in each room
+  for (const r of S.rooms) {
+    const big = Math.min(fs * 1.6, Math.max(fs, Math.min(r.w, r.d) / 7));
+    o += textHalo(r.x + r.w / 2, r.y + r.d / 2 - big * .2, r.name, big, { fill: '#e6ebf5', style: 'font-weight:700' });
+    o += textHalo(r.x + r.w / 2, r.y + r.d / 2 + big * 1.0, fmtIn(r.w) + ' × ' + fmtIn(r.d), big * .8, { fill: '#ffd479' });
+    o += textHalo(r.x + r.w / 2, r.y + r.d - fs * .6, fmtIn(r.w), fs * .8, { fill: '#9db0cc' });
+    o += textHalo(r.x + r.w - fs * .6, r.y + r.d / 2, fmtIn(r.d), fs * .8, { fill: '#9db0cc', rot: 90 });
+  }
+  const pv = UI.sk.preview;
+  if (UI.sk.tool === 'room' && pv && pv.w != null) {
+    const bad = pv.w < CONFIG.minRoom || pv.d < CONFIG.minRoom || S.rooms.some(o2 => rectsOverlap(pv, o2));
+    o += `<rect x="${rnd1(pv.x)}" y="${rnd1(pv.y)}" width="${rnd1(pv.w)}" height="${rnd1(pv.d)}" fill="${bad ? '#ff6b6b22' : '#6ea8fe22'}" stroke="${bad ? '#ff6b6b' : '#6ea8fe'}" stroke-width="${rnd1(2 / z + .5)}" stroke-dasharray="6 3" pointer-events="none" id="skPreview"/>`;
+    o += textHalo(pv.x + pv.w / 2, pv.y + pv.d / 2, fmtIn(pv.w) + ' × ' + fmtIn(pv.d), fs * 1.2, { fill: bad ? '#ff9b9b' : '#ffd479' });
+  }
+  const pts = UI.sk.pts;
+  if (UI.sk.tool === 'walls' && pts.length) {
+    const all = pv && pv.length === 2 ? pts.concat([pv]) : pts;
+    o += `<polyline points="${fp(all)}" fill="none" stroke="#6ea8fe" stroke-width="${CONFIG.wall}" stroke-linejoin="miter" opacity=".85" pointer-events="none" id="skPoly"/>`;
+    for (let i = 0; i + 1 < all.length; i++) { const a = all[i], b = all[i + 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L > 6) o += textHalo((a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - fs * .6, fmtIn(L), fs * .9, { fill: '#ffd479' }); }
+    pts.forEach((p, i) => { o += `<circle cx="${rnd1(p[0])}" cy="${rnd1(p[1])}" r="${rnd1(Math.max(2, (i === 0 ? 7 : 4) / z))}" fill="${i === 0 ? '#ffd479' : '#6ea8fe'}" stroke="#0a0e16" stroke-width="${rnd1(1 / z)}" pointer-events="none"/>`; });
+  }
+  return o;
+}
+RENDER_HOOKS.over.push(sketchOverlay);
+/* ---- panels / bars ---- */
+function isDemoPlan() { return S.rooms.length === 1 && S.rooms[0].id === 'r1' && S.rooms[0].name === 'Living room'; }
+function startBlankSketch() {
+  confirmBox('Start from scratch? This clears the current plan (rooms, furniture, fixtures) to a blank canvas in Sketch mode. You can undo it with ↶ / Ctrl+Z.', 'Start blank', () => {
+    S = Object.assign(basePlan([], [], []), { title: 'My sketch' }); UI.sel = { kind: null, id: null }; UI.curRoom = null;
+    commit(); setMode('sketch'); setSketchTool('room'); fitAll(); toast('Blank plan – drag to draw your first room, or use Draw walls');
+  });
+}
+function syncSketchBar() {
+  $$('#skbar [data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === UI.sk.tool));
+  const f = $('#skFinish'); if (f) f.style.display = UI.sk.tool === 'walls' && UI.sk.pts.length >= 2 ? '' : 'none';
+}
+function renderSketchUI() {
+  const sk = UI.mode === 'sketch';
+  const start = $('#skStart'); if (start) { let dis = false; try { dis = localStorage.getItem(SK_DISMISS_KEY) === '1'; } catch (e) { } start.classList.toggle('show', !sk && !UI.readonly && !dis && isDemoPlan()); }
+  const empty = $('#skEmpty'); if (empty) empty.classList.toggle('show', !S.rooms.length && !UI.sk.pts.length && !skWalls().length);
+  syncSketchBar();
+  const vc = $('#cardVideo'); if (vc) vc.style.display = sk || !S.rooms.length ? '' : 'none';
+  const card = $('#cardSketch'); if (!card) return;
+  card.style.display = sk ? '' : 'none'; if (!sk) return;
+  const body = $('#skBody'), a = document.activeElement; if (a && body.contains(a) && a.tagName === 'INPUT') return;
+  const r = UI.sel.kind === 'room' ? roomById(UI.sel.id) : null, nW = skWalls().length;
+  let h = `<div class="small" id="skHintText">${esc(sketchHint())}</div>`;
+  if (r) h += `<div class="row"><label>Room name</label><input type="text" id="skName" data-skr="name" value="${esc(r.name)}"></div>
+    <div class="row"><label>Type</label><select id="skType" data-skr="type">${ROOM_TYPES.map(t => `<option ${r.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select><span class="small">${fmtIn(r.w)} × ${fmtIn(r.d)} · ${Math.round(roomSqft(r) * 10) / 10} sq ft</span></div>
+    <div class="row"><button data-skact="furnish">🛋 Furnish this room</button><button data-skact="doors">🚪 Add doors / windows</button><button class="danger" data-skact="delroom">🗑 Delete</button></div>`;
+  else h += `<div class="small" style="margin-top:6px">Select a room to name it and pick its type (or double-click it on the plan).</div>`;
+  h += `<div class="row" style="margin-top:8px"><span class="small">${S.rooms.length} room${S.rooms.length === 1 ? '' : 's'} · ${nW} open sketch wall${nW === 1 ? '' : 's'}</span>${nW ? '<button data-skact="clearwalls">Clear sketch walls</button>' : ''}</div>`;
+  h += `<div class="row"><button data-skact="blank">Start blank…</button><button data-skact="fit">Fit all</button></div>`;
+  body.innerHTML = h;
+}
+function openRenameDialog(id) {
+  const r = roomById(id); if (!r) return;
+  modal(`<h3 style="margin-top:0">Room label</h3><div class="row"><label>Name</label><input type="text" id="rnName" value="${esc(r.name)}"></div><div class="row"><label>Type</label><select id="rnType">${ROOM_TYPES.map(t => `<option ${r.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div><div class="small">${fmtIn(r.w)} × ${fmtIn(r.d)} · ${Math.round(roomSqft(r) * 10) / 10} sq ft</div>`,
+    [{ label: 'Cancel' }, { label: 'Save', cls: 'primary', fn: () => { const n = ($('#rnName').value || '').trim(); const rr = roomById(id); if (!rr) return; if (n) rr.name = n; rr.type = $('#rnType').value; commit(); } }]);
+  setTimeout(() => { const i = $('#rnName'); if (i) { i.focus(); i.select(); i.onkeydown = ev => { if (ev.key === 'Enter') { const b = $$('#modal .btns button').pop(); b && b.click(); } }; } }, 30);
+}
+function bindSketch() {
+  $$('#skbar [data-tool]').forEach(b => b.onclick = () => { if (UI.mode !== 'sketch') setMode('sketch'); setSketchTool(b.dataset.tool); });
+  $('#skFinish').onclick = () => sketchFinishWalls();
+  $('#skBlank').onclick = startBlankSketch;
+  $('#skStartBtn').onclick = startBlankSketch;
+  $('#skStartX').onclick = () => { try { localStorage.setItem(SK_DISMISS_KEY, '1'); } catch (e) { } renderSketchUI(); };
+  $('#skEmptyRoom').onclick = () => { if (UI.mode !== 'sketch') setMode('sketch'); setSketchTool('room'); };
+  $('#skEmptyWalls').onclick = () => { if (UI.mode !== 'sketch') setMode('sketch'); setSketchTool('walls'); };
+  const body = $('#skBody');
+  body.onchange = e => {
+    const t = e.target, k = t.dataset.skr; if (!k) return; const r = UI.sel.kind === 'room' ? roomById(UI.sel.id) : null; if (!r) return;
+    if (k === 'name') { const v = t.value.trim(); if (v) r.name = v; } else if (k === 'type') r.type = t.value;
+    commit();
+  };
+  body.onkeydown = e => { if (e.key === 'Enter' && e.target.dataset.skr) e.target.blur(); };
+  body.onclick = e => {
+    const a = e.target.dataset.skact; if (!a) return;
+    if (a === 'blank') startBlankSketch(); else if (a === 'fit') fitAll();
+    else if (a === 'clearwalls') { S.sketchWalls = []; commit(); }
+    else if (a === 'furnish') setMode('furniture');
+    else if (a === 'doors') { setMode('edit'); toast('Edit Room: use “+ Add fixture” to add doors and windows to the selected room'); }
+    else if (a === 'delroom' && UI.sel.kind === 'room') sketchDeleteRoom(UI.sel.id);
+  };
+  svg.addEventListener('dblclick', e => {
+    if (UI.mode !== 'sketch') return;
+    if (UI.sk.tool === 'walls') { if (UI.sk.pts.length >= 2) sketchFinishWalls(); return; }
+  });
+  // Double-click / double-tap a room to rename it. The first click re-renders the SVG (the element under the
+  // pointer is replaced), so browsers often never fire 'click'/'dblclick' – detect it from pointer events instead.
+  let tap0 = null, down0 = null;
+  svg.addEventListener('pointerdown', e => { down0 = { x: e.clientX, y: e.clientY }; }, true);
+  svg.addEventListener('pointerup', e => {
+    if (UI.mode !== 'sketch' || (UI.sk.tool !== 'select' && UI.sk.tool !== 'room') || !down0) { tap0 = null; return; }
+    if (Math.hypot(e.clientX - down0.x, e.clientY - down0.y) > 6) { tap0 = null; return; }
+    const now = performance.now(), w = evWorld(e), r = roomAt(w[0], w[1]);
+    if (r && tap0 && tap0.id === r.id && now - tap0.t < 450 && Math.hypot(e.clientX - tap0.x, e.clientY - tap0.y) < 14) {
+      tap0 = null; setTimeout(() => { UI.sel = { kind: 'room', id: r.id }; UI.curRoom = r.id; openRenameDialog(r.id); }, 0); return;
+    }
+    tap0 = r ? { id: r.id, t: now, x: e.clientX, y: e.clientY } : null;
+  }, true);
+  document.addEventListener('keyup', e => { if (e.key === 'Shift') UI.sk.shift = false; });
+  panelHooks.push(renderSketchUI);
+}
+
+/* ---- 63-video-analyze.js ---- */
+/* ====================== VIDEO WALKTHROUGH – PURE ANALYSIS ====================== */
+// analyzeFrames(frames, opts) – no DOM, no globals: unit-testable in node or a page with synthetic frames.
+// frames: [{ data: Uint8Array(w*h) grayscale, w, h, t: seconds }]  (or plain Uint8Arrays with opts.w/opts.h/opts.dt)
+// This is NOT 3D reconstruction / SLAM. It estimates (1) camera turning from the horizontal shift of column-intensity
+// profiles between frames (normalised cross-correlation), (2) walking from image expansion (zoom) between frames,
+// (3) room changes from large appearance (histogram) changes, (4) wall corners from strong vertical edges, then turns
+// walking time + turning into ROUGH room sizes using stated assumptions. Every number it returns is an estimate.
+const VIDEO_ASSUMPTIONS = { fovDeg: 60, walkFtPerSec: 2.5, ceilingFt: 8, minDurationSec: 5, minFrames: 10, maxFrames: 240 };
+function analyzeFrames(framesIn, opts) {
+  opts = Object.assign({}, VIDEO_ASSUMPTIONS, opts || {});
+  const t0 = Date.now(), prog = typeof opts.onProgress === 'function' ? opts.onProgress : null;
+  const frames = (framesIn || []).map((f, i) => (f && f.data) ? { data: f.data, w: f.w || opts.w, h: f.h || opts.h, t: f.t != null ? f.t : i * (opts.dt || 0.5) } : { data: f, w: opts.w, h: f && opts.h, t: i * (opts.dt || 0.5) });
+  const fail = (code, reason, extra) => Object.assign({ ok: false, code, reason, rooms: [], segments: [], assumptions: opts, stats: { frames: frames.length } }, extra || {});
+  if (frames.length < opts.minFrames) return fail('too-few-frames', `Only ${frames.length} usable frame${frames.length === 1 ? '' : 's'} could be read from the video (need at least ${opts.minFrames}).`);
+  const W = frames[0].w, H = frames[0].h;
+  if (!W || !H || frames.some(f => !f.data || f.w !== W || f.h !== H || f.data.length < W * H)) return fail('bad-frames', 'The frames have inconsistent sizes – the video could not be read reliably.');
+  const duration = frames[frames.length - 1].t - frames[0].t;
+  if (duration < opts.minDurationSec) return fail('too-short', `The video is only ${duration.toFixed(1)} s long. Record at least ${opts.minDurationSec} s – ideally 10–60 s per room, turning slowly.`, { stats: { frames: frames.length, duration } });
+  /* ---------- per-frame features ---------- */
+  const F = frames.map((f, i) => { const r = frameFeatures(f.data, W, H); if (prog && i % 10 === 0) prog(0.4 * i / frames.length, 'features'); return r; });
+  const meanTex = avg(F.map(f => f.tex)), meanStd = avg(F.map(f => f.std)), meanLum = avg(F.map(f => f.mean));
+  const stats = { frames: frames.length, duration, meanTexture: meanTex, meanBrightness: meanLum, width: W, height: H };
+  if (meanStd < 4 || meanTex < 1.2) return fail('no-features', meanLum < 25 ? 'The video is too dark – there is almost no visible detail to track.' : 'The video has almost no visible detail (blank, blurred or covered lens) to track.', { stats });
+  /* ---------- frame-to-frame motion ---------- */
+  const P = [];
+  for (let i = 1; i < frames.length; i++) {
+    const a = F[i - 1], b = F[i], dt = Math.max(1e-3, frames[i].t - frames[i - 1].t);
+    const sx = profileShift(a.col, b.col, Math.floor(W * 0.3)), sy = profileShift(a.row, b.row, Math.floor(H * 0.3));
+    const sc = scaleEstimate(frames[i - 1].data, frames[i].data, W, H, sx.shift, sy.shift);
+    const hd = histDist(a.hist, b.hist);
+    const yawDeg = -sx.shift / W * opts.fovDeg; // content moving right => camera turned left (counter-clockwise from above)
+    P.push({ i, dt, dx: sx.shift, dy: sy.shift, peak: sx.peak, yawDeg, yawRate: yawDeg / dt, scale: sc.scale, gain: sc.gain, resid: sc.resid, raw: sc.raw, hd });
+    if (prog && i % 10 === 0) prog(0.4 + 0.45 * i / frames.length, 'motion');
+  }
+  const noise = Math.min(4, Math.max(0.5, percentile(P.map(p => p.raw), 0.1))); // sensor-noise floor (capped so a video of pure noise still counts as 'changing')
+  P.forEach(p => {
+    p.rotating = p.peak >= 0.45 && Math.abs(p.yawRate) >= 6;
+    const sRate = (p.scale - 1) / p.dt;
+    // fast panning blurs/warps frames and fakes small zooms: while turning fast, demand much stronger zoom evidence
+    p.walking = Math.abs(sRate) >= 0.03 && p.gain > 0.06 && (Math.abs(p.dx) < 0.12 * W || p.gain > 0.25);
+    p.moving = p.raw > noise * 2.2 + 1.5;
+  });
+  const totalYaw = P.reduce((s, p) => s + (p.peak >= 0.45 ? Math.abs(p.yawDeg) : 0), 0);
+  const walkSecAll = P.reduce((s, p) => s + (p.walking ? p.dt : 0), 0), moveFrac = P.filter(p => p.moving).length / P.length;
+  stats.totalTurnDeg = totalYaw; stats.walkSec = walkSecAll; stats.movingFraction = moveFrac;
+  if (totalYaw < 15 && walkSecAll < 1 && moveFrac < 0.15) return fail('no-motion', 'The camera barely moves in this video (no turning or walking detected), so there is nothing to estimate a layout from.', { stats });
+  /* ---------- split into segments (rooms) ---------- */
+  const cuts = [0]; let ref = F[0].hist.slice(), refN = 1, walkSince = 0;
+  for (const p of P) {
+    const i = p.i, abrupt = p.hd > 0.35 && p.peak < 0.6;
+    const drift = histDist(ref, F[i].hist) > 0.45 && walkSince >= 2;
+    const segLen = frames[i].t - frames[cuts[cuts.length - 1]].t;
+    if ((abrupt || drift) && segLen >= 2.5) { cuts.push(i); p.cut = true; ref = F[i].hist.slice(); refN = 1; walkSince = 0; continue; }
+    if (p.walking) walkSince += p.dt;
+    if (refN < 6) { for (let k = 0; k < ref.length; k++) ref[k] = (ref[k] * refN + F[i].hist[k]) / (refN + 1); refN++; }
+  }
+  cuts.push(frames.length);
+  let segs = [];
+  for (let s = 0; s + 1 < cuts.length; s++) {
+    const a = cuts[s], b = cuts[s + 1], pp = P.filter(p => p.i > a && p.i < b);
+    segs.push({ a, b, start: frames[a].t, end: frames[b - 1].t, pairs: pp });
+  }
+  // merge segments shorter than 2.5 s into the previous one
+  for (let k = segs.length - 1; k > 0; k--) if (segs[k].end - segs[k].start < 2.5) { segs[k - 1].b = segs[k].b; segs[k - 1].end = segs[k].end; segs[k - 1].pairs = P.filter(p => p.i > segs[k - 1].a && p.i < segs[k - 1].b); segs.splice(k, 1); }
+  if (prog) prog(0.9, 'segments');
+  /* ---------- per-segment estimates ---------- */
+  const segments = segs.map((sg, k) => {
+    const pp = sg.pairs, dur = Math.max(0, sg.end - sg.start);
+    const good = pp.filter(p => p.peak >= 0.45);
+    const sweep = good.reduce((s, p) => s + Math.abs(p.yawDeg), 0), net = good.reduce((s, p) => s + p.yawDeg, 0);
+    const rotSec = pp.reduce((s, p) => s + (p.rotating ? p.dt : 0), 0), walkSec = pp.reduce((s, p) => s + (p.walking ? p.dt : 0), 0);
+    const meanPeak = pp.length ? avg(pp.map(p => p.peak)) : 0, tex = avg(F.slice(sg.a, sg.b).map(f => f.tex));
+    const corners = countCorners(F, P, sg.a, sg.b, W, opts.fovDeg);
+    const distFt = walkSec * opts.walkFtPerSec;
+    const sizeFromWalk = walkSec >= 1.5; // turning in place alone gives no distance information -> fall back to a typical 12 ft room
+    let longFt = sizeFromWalk ? clampN(distFt + 4, 6, 30) : 12;
+    const aspect = sweep >= 270 ? 0.85 : sweep >= 120 ? 0.75 : 0.65;
+    let shortFt = clampN(longFt * aspect, 5, 24);
+    const half = v => Math.round(v * 2) / 2;
+    longFt = half(longFt); shortFt = half(shortFt);
+    const qTrack = clampN((meanPeak - 0.3) / 0.5, 0, 1), qTex = clampN((tex - 1.5) / 8, 0, 1), qDur = clampN(dur / 8, 0, 1);
+    const qSig = clampN(sweep / 180, 0, 1) * 0.5 + clampN(walkSec / 3, 0, 1) * 0.5;
+    // tracking quality and an actual motion signal gate the score: untrackable or motionless footage can never score well
+    const score = (0.3 * qTrack + 0.2 * qTex + 0.2 * qDur + 0.3 * qSig) * Math.min(1, qTrack * 2) * (0.3 + 0.7 * Math.min(1, qSig * 2));
+    let confidence = score >= 0.7 ? 'high' : score >= 0.45 ? 'medium' : 'low';
+    if (!sizeFromWalk && confidence === 'high') confidence = 'medium'; // room found, but its size is a default guess
+    return { index: k, start: sg.start, end: sg.end, duration: dur, frames: sg.b - sg.a, turnDeg: Math.round(sweep), netTurnDeg: Math.round(net), turnDir: net > 10 ? 'right (clockwise)' : net < -10 ? 'left (counter-clockwise)' : 'mixed', rotatingSec: rnd(rotSec), walkingSec: rnd(walkSec), rotatingInPlace: rotSec >= Math.max(1.5, dur * 0.4) && walkSec < 1, walkDistFt: rnd(distFt), sizeBasis: sizeFromWalk ? 'walking time' : 'typical-room default (little walking detected)', corners, trackingQuality: rnd(meanPeak), texture: rnd(tex), score: rnd(score), confidence, wFt: longFt, dFt: shortFt };
+  });
+  const best = Math.max(...segments.map(s => s.score)), mean = avg(segments.map(s => s.score));
+  stats.segments = segments.length; stats.meanScore = rnd(mean); stats.ms = Date.now() - t0;
+  if (best < 0.35 || mean < 0.3) return fail('low-confidence', 'The motion in this video could not be tracked reliably (shaky, too fast, blurry or too little detail), so any layout would be a guess.', { stats, segments });
+  const rooms = segments.map((s, k) => ({ name: 'Room ' + (k + 1), wIn: Math.round(s.wFt * 2) * 6, dIn: Math.round(s.dFt * 2) * 6, confidence: s.confidence, segment: k }));
+  if (prog) prog(1, 'done');
+  const out = { ok: true, code: 'ok', reason: '', rooms, segments, stats, assumptions: opts };
+  if (opts.debug) out.pairs = P.map(p => ({ i: p.i, t: frames[p.i].t, dx: Math.round(p.dx * 10) / 10, peak: Math.round(p.peak * 100) / 100, hd: Math.round(p.hd * 100) / 100, scale: p.scale, gain: Math.round(p.gain * 100) / 100, walking: p.walking, cut: !!p.cut }));
+  return out;
+  /* ---------- helpers ---------- */
+  function avg(a) { return a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0; }
+  function rnd(v) { return Math.round(v * 100) / 100; }
+  function clampN(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function percentile(a, q) { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(q * s.length))]; }
+}
+function frameFeatures(d, W, H) {
+  const col = new Float32Array(W), row = new Float32Array(H), hist = new Float32Array(16), vcol = new Float32Array(W);
+  let sum = 0, sum2 = 0, tex = 0, n = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const v = d[y * W + x]; col[x] += v; row[y] += v; sum += v; sum2 += v * v; hist[v >> 4]++; }
+  const N = W * H, mean = sum / N, std = Math.sqrt(Math.max(0, sum2 / N - mean * mean));
+  for (let x = 0; x < W; x++) col[x] /= H; for (let y = 0; y < H; y++) row[y] /= W; for (let k = 0; k < 16; k++) hist[k] /= N;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x;
+    const gx = (d[i - W + 1] + 2 * d[i + 1] + d[i + W + 1]) - (d[i - W - 1] + 2 * d[i - 1] + d[i + W - 1]);
+    const gy = (d[i + W - 1] + 2 * d[i + W] + d[i + W + 1]) - (d[i - W - 1] + 2 * d[i - W] + d[i - W + 1]);
+    const ax = Math.abs(gx), ay = Math.abs(gy); tex += (ax + ay) / 8; n++;
+    if (ax > 2 * ay && ax > 40) vcol[x] += ax / 8;
+  }
+  return { mean, std, tex: n ? tex / n : 0, col: highpass(col, 9), row: highpass(row, 9), hist, vcol };
+}
+function highpass(a, r) { // subtract a moving average (removes lighting gradients) and normalise
+  const n = a.length, o = new Float32Array(n); let ss = 0;
+  for (let i = 0; i < n; i++) { let s = 0, c = 0; for (let k = Math.max(0, i - r); k <= Math.min(n - 1, i + r); k++) { s += a[k]; c++; } o[i] = a[i] - s / c; ss += o[i] * o[i]; }
+  const sd = Math.sqrt(ss / n) || 1; for (let i = 0; i < n; i++) o[i] /= sd; return o;
+}
+function profileShift(A, B, maxLag) { // normalised cross-correlation of 1D profiles: returns the lag s with B[x+s] ~ A[x]
+  const n = A.length; let best = -2, bs = 0; const c = new Float32Array(2 * maxLag + 1);
+  for (let s = -maxLag; s <= maxLag; s++) {
+    let sab = 0, saa = 0, sbb = 0; const x0 = Math.max(0, -s), x1 = Math.min(n, n - s);
+    if (x1 - x0 < n * 0.5) { c[s + maxLag] = -1; continue; }
+    for (let x = x0; x < x1; x++) { const a = A[x], b = B[x + s]; sab += a * b; saa += a * a; sbb += b * b; }
+    const v = sab / (Math.sqrt(saa * sbb) || 1); c[s + maxLag] = v; if (v > best) { best = v; bs = s; }
+  }
+  let sub = bs; const k = bs + maxLag;
+  if (k > 0 && k < c.length - 1) { const y0 = c[k - 1], y1 = c[k], y2 = c[k + 1], den = y0 - 2 * y1 + y2; if (Math.abs(den) > 1e-6) sub = bs + Math.max(-0.5, Math.min(0.5, 0.5 * (y0 - y2) / den)); }
+  return { shift: sub, peak: best };
+}
+function scaleEstimate(A, B, W, H, dx, dy) { // zoom between frames about the centre (after removing the global shift)
+  const cx = W / 2, cy = H / 2, st = 2, m = Math.round(Math.max(W, H) * 0.12);
+  const cost = s => { let e = 0, n = 0; for (let y = m; y < H - m; y += st) for (let x = m; x < W - m; x += st) { const ax = Math.round((x - dx - cx) / s + cx), ay = Math.round((y - dy - cy) / s + cy); if (ax < 0 || ay < 0 || ax >= W || ay >= H) continue; e += Math.abs(B[y * W + x] - A[ay * W + ax]); n++; } return n ? e / n : 1e9; };
+  let raw = 0, rn = 0; for (let y = m; y < H - m; y += st) for (let x = m; x < W - m; x += st) { raw += Math.abs(B[y * W + x] - A[y * W + x]); rn++; } raw /= rn || 1;
+  const c1 = cost(1); let bestS = 1, bestC = c1;
+  for (let s = 0.86; s <= 1.2001; s += 0.02) { const c = cost(s); if (c < bestC) { bestC = c; bestS = s; } }
+  for (let s = bestS - 0.015; s <= bestS + 0.0151; s += 0.005) { const c = cost(s); if (c < bestC) { bestC = c; bestS = s; } }
+  return { scale: Math.round(bestS * 1000) / 1000, gain: c1 > 0 ? (c1 - bestC) / c1 : 0, resid: bestC, raw };
+}
+function histDist(a, b) { let s = 0; for (let k = 0; k < a.length; k++) s += Math.abs(a[k] - b[k]); return s / 2; }
+function countCorners(F, P, a, b, W, fov) { // strong vertical edges, located in accumulated-yaw space, counted once each
+  const bins = new Map(); let yaw = 0;
+  for (let i = a; i < b; i++) {
+    if (i > a) { const p = P[i - 1]; if (p && p.peak >= 0.45) yaw += p.yawDeg; }
+    const v = F[i].vcol; let m = 0, s2 = 0; for (let x = 0; x < W; x++) { m += v[x]; s2 += v[x] * v[x]; } m /= W; const sd = Math.sqrt(Math.max(0, s2 / W - m * m));
+    const thr = m + 2.5 * sd; if (sd < 1) continue; let last = -99;
+    for (let x = 2; x < W - 2; x++) if (v[x] > thr && v[x] >= v[x - 1] && v[x] >= v[x + 1] && x - last > 8) { last = x; const ang = yaw + (x / W - 0.5) * fov, key = Math.round(ang / 10); bins.set(key, (bins.get(key) || 0) + 1); }
+  }
+  const keys = [...bins.keys()].filter(k => bins.get(k) >= 3).sort((x, y) => x - y); let n = 0, prev = -1e9;
+  for (const k of keys) { if (k - prev > 1) n++; prev = k; }
+  return Math.min(n, 12);
+}
+if (typeof module !== 'undefined' && module.exports) module.exports = { analyzeFrames, frameFeatures, profileShift, scaleEstimate, histDist, VIDEO_ASSUMPTIONS };
+
+/* ---- 64-video.js ---- */
+/* ====================== VIDEO WALKTHROUGH – UI (beta) ====================== */
+// Upload or record a walkthrough; frames are sampled + analysed locally (analyzeFrames). Nothing leaves the device.
+const VID = { view: 'closed', stream: null, rec: null, chunks: [], recT0: 0, timer: null, live: [], liveTimer: null, cancel: false, result: null, lastError: null, recordedBytes: 0, busy: false };
+const VID_MAX_REC_SEC = 180, VID_SAMPLE_W = 160, VID_MAX_FRAMES = 240;
+const VID_STAGES = [['load', 'Loading video'], ['sample', 'Sampling frames'], ['motion', 'Estimating camera motion'], ['rooms', 'Splitting into rooms'], ['layout', 'Building layout']];
+function vmBox() { return $('#vmBox'); }
+function vmShow(html) { const m = $('#vmodal'); vmBox().innerHTML = html; m.classList.add('show'); }
+function closeVideoModal() { VID.cancel = true; stopCamera(); $('#vmodal').classList.remove('show'); VID.view = 'closed'; }
+function vmHeader() { return `<h3 id="vmTitle" style="margin-top:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">🎥 Video walkthrough <span class="pill warn">Beta – rough estimate from video</span></h3><div class="vm-private">🔒 Processed entirely on this device. Your video is never uploaded anywhere.</div>`; }
+function vmAssumptions() {
+  const A = VIDEO_ASSUMPTIONS;
+  return `<details class="small"><summary>How it works &amp; assumptions</summary><ul class="vm-ul"><li>Not 3D reconstruction or SLAM. It samples up to ${VID_MAX_FRAMES} frames (every ≥0.5 s) at ${VID_SAMPLE_W}px wide, measures how the picture <b>shifts</b> (turning) and <b>zooms</b> (walking) between frames, splits the walk into rooms at big changes in appearance, and counts strong vertical edges (likely wall corners).</li><li>Sizes assume a walking speed of ~${A.walkFtPerSec} ft/s, a ~${A.fovDeg}° horizontal camera field of view and ~${A.ceilingFt} ft ceilings. A room's long side ≈ walking distance + 4 ft; the short side comes from how much you turned. Rooms are placed side by side in the order you walked.</li><li>Expect errors of several feet. Treat the result as a starting sketch to correct.</li></ul></details>`;
+}
+function openVideoModal() {
+  VID.cancel = false; VID.view = 'choose'; stopCamera();
+  vmShow(`${vmHeader()}
+  <p class="small">Film a slow walk through your home: in each room pause, turn slowly all the way round, then walk to the next room. Keep the phone level, lights on, 10 s – 3 min.</p>
+  <div class="vm-choices"><label class="vm-choice" for="vmFile" tabindex="0"><span class="big">📁</span><b>Upload a video</b><span class="small">mp4 / webm / mov from your phone</span></label><input type="file" id="vmFile" accept="video/*" hidden>
+  <button class="vm-choice" id="vmRecBtn"><span class="big">📷</span><b>Record with camera</b><span class="small">up to ${VID_MAX_REC_SEC / 60} minutes</span></button></div>
+  ${vmAssumptions()}
+  <div class="btns"><button id="vmSketch">Skip – sketch it by hand</button><button id="vmClose">Close</button></div>`);
+  $('#vmFile').onchange = e => { const f = e.target.files[0]; if (f) processVideoFile(f); };
+  $('#vmRecBtn').onclick = openRecorder; $('#vmClose').onclick = closeVideoModal;
+  $('#vmSketch').onclick = () => { closeVideoModal(); setMode('sketch'); };
+}
+/* ---------- camera recording ---------- */
+function stopCamera() {
+  clearInterval(VID.timer); clearInterval(VID.liveTimer); VID.timer = VID.liveTimer = null;
+  try { if (VID.rec && VID.rec.state !== 'inactive') { VID.rec.onstop = null; VID.rec.stop(); } } catch (e) { }
+  VID.rec = null; if (VID.stream) VID.stream.getTracks().forEach(t => t.stop()); VID.stream = null;
+}
+function camErrorText(e) {
+  const n = e && e.name;
+  if (n === 'NotAllowedError' || n === 'SecurityError') return 'Camera permission was denied. Allow camera access for this page in your browser settings and try again – or upload a video you already recorded.';
+  if (n === 'NotFoundError' || n === 'OverconstrainedError' || n === 'DevicesNotFoundError') return 'No camera was found on this device. Upload a video instead.';
+  if (n === 'NotReadableError') return 'The camera is in use by another app. Close it and try again, or upload a video.';
+  if (n === 'NoSupport') return 'This browser cannot record video here' + (location.protocol === 'file:' || window.isSecureContext === false ? ' (camera access needs https:// or a locally saved file in some browsers)' : '') + '. Upload a video instead.';
+  return 'Could not start the camera' + (e && e.message ? ' (' + e.message + ')' : '') + '. Upload a video instead.';
+}
+async function openRecorder() {
+  VID.view = 'record';
+  vmShow(`${vmHeader()}<div class="vm-live"><video id="vmLive" autoplay muted playsinline></video><div id="vmRecInfo" class="small">Starting camera…</div></div>
+  <div class="btns"><button id="vmBack">Back</button><button id="vmRecStart" class="primary" disabled>● Record</button><button id="vmRecStop" class="danger" disabled>■ Stop &amp; analyse</button></div>`);
+  $('#vmBack').onclick = () => { stopCamera(); openVideoModal(); };
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') throw Object.assign(new Error('unsupported'), { name: 'NoSupport' });
+    const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+    if (VID.view !== 'record') { st.getTracks().forEach(t => t.stop()); return; }
+    VID.stream = st; const v = $('#vmLive'); v.srcObject = st; try { await v.play(); } catch (e) { }
+    $('#vmRecInfo').textContent = 'Camera ready. Press Record, then walk slowly through your rooms (max ' + VID_MAX_REC_SEC / 60 + ' min).';
+    $('#vmRecStart').disabled = false; $('#vmRecStart').onclick = startRecording;
+  } catch (e) { VID.lastError = e && e.name; vmShowCamError(camErrorText(e)); }
+}
+function vmShowCamError(msg) {
+  vmShow(`${vmHeader()}<div class="vm-fail" id="vmCamError"><b>Camera unavailable</b><p>${esc(msg)}</p></div><div class="btns"><button id="vmBack">Back</button><label class="btnlike primary" for="vmFile2">📁 Upload a video instead</label><input type="file" id="vmFile2" accept="video/*" hidden></div>`);
+  $('#vmBack').onclick = openVideoModal; $('#vmFile2').onchange = e => { const f = e.target.files[0]; if (f) processVideoFile(f); };
+}
+function startRecording() {
+  const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
+  const mt = types.find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } });
+  let rec; try { rec = new MediaRecorder(VID.stream, mt ? { mimeType: mt } : undefined); } catch (e) { vmShowCamError(camErrorText(e)); return; }
+  VID.rec = rec; VID.chunks = []; VID.live = []; VID.recT0 = performance.now();
+  rec.ondataavailable = e => { if (e.data && e.data.size) VID.chunks.push(e.data); };
+  rec.onstop = () => { const blob = new Blob(VID.chunks, { type: rec.mimeType || mt || 'video/webm' }), secs = (performance.now() - VID.recT0) / 1000, live = VID.live; VID.recordedBytes = blob.size; stopCamera(); processRecording(blob, secs, live); };
+  rec.start(1000);
+  // sample frames live while recording (reliable even when the recorded file has no seek index)
+  const v = $('#vmLive'), cv = document.createElement('canvas'); let ctx = null;
+  VID.liveTimer = setInterval(() => {
+    if (!v.videoWidth) return; if (!ctx) { cv.width = VID_SAMPLE_W; cv.height = sampleH(v.videoWidth, v.videoHeight); ctx = cv.getContext('2d', { willReadFrequently: true }); }
+    if (VID.live.length >= VID_MAX_FRAMES * 2) return; // 0.5 s spacing over 3 min = 360; thinned later
+    ctx.drawImage(v, 0, 0, cv.width, cv.height); VID.live.push({ data: toGray(ctx.getImageData(0, 0, cv.width, cv.height)), w: cv.width, h: cv.height, t: (performance.now() - VID.recT0) / 1000 });
+  }, 500);
+  $('#vmRecStart').disabled = true; $('#vmRecStop').disabled = false; $('#vmRecStop').onclick = () => { if (VID.rec && VID.rec.state !== 'inactive') VID.rec.stop(); };
+  VID.timer = setInterval(() => { const s = (performance.now() - VID.recT0) / 1000, el = $('#vmRecInfo'); if (el) el.innerHTML = `<span class="recdot">●</span> Recording ${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')} / ${VID_MAX_REC_SEC / 60}:00 · ${VID.live.length} frames sampled`; if (s >= VID_MAX_REC_SEC && VID.rec && VID.rec.state !== 'inactive') VID.rec.stop(); }, 250);
+}
+async function processRecording(blob, secs, live) {
+  VID.cancel = false; vmProgress('load', 0);
+  let frames = live.slice(); if (frames.length > VID_MAX_FRAMES) { const k = frames.length / VID_MAX_FRAMES; frames = Array.from({ length: VID_MAX_FRAMES }, (_, i) => frames[Math.floor(i * k)]); }
+  VID.source = { kind: 'camera', seconds: secs, bytes: blob.size, type: blob.type };
+  if (frames.length >= 10) return runAnalysis(frames);
+  return processVideoFile(blob, { knownDuration: secs, recorded: true });
+}
+/* ---------- upload / decode + frame sampling ---------- */
+function sampleH(vw, vh) { return clamp(Math.round(VID_SAMPLE_W * vh / (vw || 1)), 60, 320); }
+function toGray(img) { const d = img.data, n = img.width * img.height, g = new Uint8Array(n); for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (d[j] * 77 + d[j + 1] * 150 + d[j + 2] * 29) >> 8; return g; }
+function waitEv(el, ok, bad, ms) {
+  return new Promise(res => { let done = false; const fin = v => { if (done) return; done = true; clearTimeout(t); ok.forEach(n => el.removeEventListener(n, onOk)); (bad || []).forEach(n => el.removeEventListener(n, onBad)); res(v); }; const onOk = () => fin('ok'), onBad = () => fin('error'); const t = setTimeout(() => fin('timeout'), ms); ok.forEach(n => el.addEventListener(n, onOk)); (bad || []).forEach(n => el.addEventListener(n, onBad)); });
+}
+async function processVideoFile(file, opts = {}) {
+  VID.cancel = false; VID.busy = true; vmProgress('load', 0);
+  if (!VID.source || !opts.recorded) VID.source = { kind: 'file', name: file.name || 'recording', bytes: file.size, type: file.type };
+  const url = URL.createObjectURL(file), v = document.createElement('video');
+  v.muted = true; v.playsInline = true; v.preload = 'auto'; v.crossOrigin = 'anonymous';
+  const done = () => { try { v.removeAttribute('src'); v.load(); } catch (e) { } URL.revokeObjectURL(url); VID.busy = false; };
+  try {
+    v.src = url;
+    const r = await waitEv(v, ['loadeddata'], ['error'], 20000);
+    if (VID.cancel) return done();
+    if (r !== 'ok' || !v.videoWidth) { done(); return vmFail('decode', r === 'timeout' ? 'The video took too long to open – it may be in a format this browser cannot play (for example HEVC/H.265 from some iPhones in Chrome/Firefox). Try exporting it as “Most compatible” / H.264, or record here.' : 'This browser could not decode the file as a video' + (file.type && !/^video\//.test(file.type) ? ' (it is “' + file.type + '”, not a video)' : '') + '. Try an mp4 (H.264) or webm file, or record here.'); }
+    let dur = v.duration;
+    if (!isFinite(dur) || dur <= 0) { v.currentTime = 1e7; await waitEv(v, ['durationchange', 'seeked'], [], 4000); dur = v.duration; if (!isFinite(dur) || dur <= 0) dur = opts.knownDuration || NaN; }
+    if (!isFinite(dur)) { done(); return vmFail('decode', 'The video length could not be determined, so frames could not be sampled.'); }
+    if (dur < VIDEO_ASSUMPTIONS.minDurationSec) { done(); return vmFail('too-short', `The video is only ${dur.toFixed(1)} s long. Record at least ${VIDEO_ASSUMPTIONS.minDurationSec} s – ideally 10–60 s per room, turning slowly.`, { duration: dur }); }
+    const step = Math.max(dur < 30 ? 0.25 : 0.5, dur / VID_MAX_FRAMES), times = []; for (let t = Math.min(0.05, dur / 10); t < dur - 0.05 && times.length < VID_MAX_FRAMES; t += step) times.push(t);
+    const cv = document.createElement('canvas'); cv.width = VID_SAMPLE_W; cv.height = sampleH(v.videoWidth, v.videoHeight); const ctx = cv.getContext('2d', { willReadFrequently: true });
+    const frames = []; let misses = 0;
+    for (let k = 0; k < times.length; k++) {
+      if (VID.cancel) return done();
+      v.currentTime = times[k]; const s = await waitEv(v, ['seeked'], ['error'], 5000);
+      if (s !== 'ok') { if (++misses > 8) break; continue; }
+      ctx.drawImage(v, 0, 0, cv.width, cv.height); frames.push({ data: toGray(ctx.getImageData(0, 0, cv.width, cv.height)), w: cv.width, h: cv.height, t: times[k] });
+      vmProgress('sample', (k + 1) / times.length, `${frames.length} / ${times.length} frames`);
+    }
+    done(); VID.source.seconds = dur;
+    return runAnalysis(frames);
+  } catch (e) { done(); return vmFail('decode', 'Something went wrong while reading the video: ' + (e && e.message || e)); }
+}
+async function runAnalysis(frames) {
+  if (VID.cancel) return;
+  vmProgress('motion', 0, frames.length + ' frames'); await new Promise(r => setTimeout(r, 30));
+  let res;
+  try { res = analyzeFrames(frames, { debug: !!window.__videoDebug }); } catch (e) { return vmFail('error', 'The analysis failed: ' + e.message); }
+  if (VID.cancel) return;
+  vmProgress('rooms', 1); await new Promise(r => setTimeout(r, 30));
+  vmProgress('layout', 1); await new Promise(r => setTimeout(r, 30));
+  VID.result = res; window.__lastVideoResult = res;
+  if (!res.ok) return vmFail(res.code, res.reason, res.stats);
+  vmResults(res);
+}
+/* ---------- progress / results / fallback views ---------- */
+function vmProgress(stage, frac, note) {
+  if (VID.cancel) return;
+  const idx = VID_STAGES.findIndex(s => s[0] === stage), spans = [[0, 5], [5, 75], [75, 90], [90, 95], [95, 100]], [a, b] = spans[idx], pct = Math.round(a + (b - a) * clamp(frac || 0, 0, 1));
+  if (VID.view !== 'progress') {
+    VID.view = 'progress';
+    vmShow(`${vmHeader()}<div id="vmProg"><div class="vm-stage"><b id="vmStage"></b> <span id="vmPct">0%</span></div><div class="bar vm-bar"><i id="vmBar" style="width:0%;background:var(--acc)"></i></div><div class="small" id="vmNote"></div><ol class="vm-stages">${VID_STAGES.map(s => `<li data-st="${s[0]}">${s[1]}</li>`).join('')}</ol></div><div class="btns"><button id="vmCancel" class="danger">Cancel</button></div>`);
+    $('#vmCancel').onclick = () => { VID.cancel = true; VID.view = 'choose'; toast('Video analysis cancelled'); openVideoModal(); };
+  }
+  $('#vmStage').textContent = VID_STAGES[idx][1] + '…'; $('#vmPct').textContent = pct + '%'; $('#vmBar').style.width = pct + '%'; $('#vmNote').textContent = note || '';
+  $$('#vmProg [data-st]').forEach((li, i) => { li.className = i < idx ? 'done' : i === idx ? 'cur' : ''; });
+  $('#vmProg').dataset.pct = pct;
+}
+function vmFail(code, reason, stats) {
+  VID.view = 'fail'; VID.result = VID.result && VID.result.code === code ? VID.result : { ok: false, code, reason, stats };
+  const tips = { 'decode': '', 'too-short': 'Record a longer clip (10–60 s per room).', 'no-features': 'Turn the lights on and keep the lens uncovered.', 'no-motion': 'Turn slowly round in each room and walk from room to room.', 'low-confidence': 'Move slower and steadier, keep the phone level, and avoid pointing at blank walls for long.', 'too-few-frames': 'Try a longer clip or a different file format.' };
+  vmShow(`${vmHeader()}<div class="vm-fail" id="vmFail" data-code="${esc(code)}"><b>⚠ Couldn't build a layout from this video</b><p>${esc(reason)}</p>${tips[code] ? `<p class="small">Tip: ${esc(tips[code])}</p>` : ''}<p class="small">No rooms were added. You can sketch your layout by hand instead – it only takes a minute.</p>${stats && stats.frames ? `<div class="small">Read ${stats.frames} frames${stats.duration ? ' · ' + stats.duration.toFixed(1) + ' s' : ''}</div>` : ''}</div>
+  <div class="btns"><button id="vmRetry">Try another video</button><button id="vmToSketch" class="primary">✏️ Switch to Sketch mode</button></div>`);
+  $('#vmRetry').onclick = openVideoModal; $('#vmToSketch').onclick = () => { closeVideoModal(); setMode('sketch'); if (!S.rooms.length) setSketchTool('room'); };
+}
+function vmPreviewSVG(rooms) {
+  let x = 0; const R = rooms.map(r => { const o = { x, y: 0, w: r.wIn, d: r.dIn, name: r.name }; x += r.wIn; return o; });
+  const W = Math.max(1, x), H = Math.max(1, ...R.map(r => r.d)), pad = 8;
+  return `<svg class="vm-prev" viewBox="${-pad} ${-pad} ${W + 2 * pad} ${H + 2 * pad}" preserveAspectRatio="xMidYMid meet">${R.map((r, i) => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.d}" fill="${i % 2 ? '#2d384a' : '#26303f'}" stroke="#9db0cc" stroke-width="${Math.max(2, W / 200)}" stroke-dasharray="${W / 60} ${W / 120}"/><text x="${r.x + r.w / 2}" y="${r.d / 2}" fill="#e6ebf5" font-size="${Math.max(10, Math.min(r.w, r.d) / 6)}" text-anchor="middle">${esc(r.name)}</text>`).join('')}</svg>`;
+}
+function vmResults(res) {
+  VID.view = 'results';
+  const confPill = c => `<span class="pill ${c === 'high' ? 'ok' : c === 'medium' ? '' : 'warn'}">${c}</span>`;
+  const rows = res.rooms.map((r, i) => { const s = res.segments[r.segment]; return `<tr><td><input type="text" data-vroom="${i}" value="${esc(r.name)}" aria-label="Room ${i + 1} name"></td><td><b>${fmtIn(r.wIn)} × ${fmtIn(r.dIn)}</b><div class="small">est.</div></td><td>${confPill(r.confidence)}</td><td class="small">${s.start.toFixed(0)}–${s.end.toFixed(0)} s · turned ~${s.turnDeg}° · walked ~${s.walkingSec}s${s.rotatingInPlace ? ' · turning in place' : ''} · ~${s.corners} vertical edge${s.corners === 1 ? '' : 's'}<br>size from: ${esc(s.sizeBasis)}</td></tr>`; }).join('');
+  vmShow(`${vmHeader()}<div id="vmResults"><div class="vm-head"><span class="score" id="vmCount">${res.rooms.length}</span><div><b>room${res.rooms.length === 1 ? '' : 's'} detected</b><div class="small">from ${res.stats.frames} frames over ${res.stats.duration.toFixed(0)} s · total turning ~${Math.round(res.stats.totalTurnDeg)}° · walking ~${Math.round(res.stats.walkSec)} s</div></div></div>
+  ${vmPreviewSVG(res.rooms)}
+  <div class="vm-note">⚠ <b>This is a rough estimate – adjust it in Sketch mode.</b> Sizes come from walking time and turning, not measurements; room shapes are drawn as plain rectangles placed side by side in walk order.</div>
+  <div class="vm-tablewrap"><table class="vm-table"><tr><th>Name</th><th>Size (W × D)</th><th>Confidence</th><th>Evidence</th></tr>${rows}</table></div>
+  ${vmAssumptions()}</div>
+  <div class="btns"><button id="vmCancelRes">Cancel</button><button id="vmUse" class="primary">Use this layout</button></div>`);
+  $$('#vmResults [data-vroom]').forEach(inp => inp.oninput = () => { const r = res.rooms[+inp.dataset.vroom]; if (r) r.name = inp.value.trim() || r.name; });
+  $('#vmCancelRes').onclick = closeVideoModal; $('#vmUse').onclick = () => useVideoLayout(res);
+}
+function useVideoLayout(res) {
+  if (!res || !res.ok || !res.rooms.length) return;
+  const bb = S.rooms.length ? planBBox() : { x: 0, y: 0, w: 0, d: 0 };
+  let x = S.rooms.length ? snapTo(bb.x + bb.w + 48, 6) : 0; const y = S.rooms.length ? snapTo(bb.y, 6) : 0, ids = [];
+  for (const r of res.rooms) {
+    const room = newRoom({ name: r.name, type: 'room', x, y, w: r.wIn, d: r.dIn, fixtures: [], wallLabels: {}, sketch: true, fromVideo: { confidence: r.confidence } });
+    while (S.rooms.some(o => roomsOverlap(room, o))) room.y += 24; // never overlap (should not happen: placed right of the plan)
+    S.rooms.push(room); ids.push(room.id); x += r.wIn;
+  }
+  UI.sel = { kind: 'room', id: ids[0] }; UI.curRoom = ids[0];
+  commit(); closeVideoModal(); setMode('sketch'); setSketchTool('select'); fitAll();
+  toast(`Added ${ids.length} rough room${ids.length === 1 ? '' : 's'} from the video – drag / resize / rename them in Sketch mode (↶ undoes)`, 4500);
+}
+function bindVideo() {
+  const open = () => openVideoModal();
+  ['#btnVideo', '#btnVideoCard', '#skVideo', '#skEmptyVideo'].forEach(s => { const b = $(s); if (b) b.onclick = open; });
+  $('#vmodal').addEventListener('click', e => { if (e.target.id === 'vmodal' && VID.view !== 'progress') closeVideoModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#vmodal').classList.contains('show')) { if (VID.view === 'progress') { VID.cancel = true; toast('Video analysis cancelled'); } closeVideoModal(); } });
+}
+
 /* ---- 70-share.js ---- */
 /* ====================== SHARE LINK + NEW PLAN ====================== */
 const b64u = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
@@ -1779,7 +2512,7 @@ async function loadFromHash(initial) {
   const m = /^#plan=(.+)$/.exec(location.hash); if (!m) return false;
   UI.readonly = true; // do not touch the visitor's autosave until they edit
   try {
-    const o = await decodePlan(m[1]); S = migratePlan(o); UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0].id;
+    const o = await decodePlan(m[1]); S = migratePlan(o); UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0] ? S.rooms[0].id : null;
     if (o.settings) { if (typeof o.settings.snap === 'boolean') UI.snap = o.settings.snap; if (o.settings.grid && CONFIG.gridChoices.includes(o.settings.grid)) UI.grid = o.settings.grid; }
     histReset(); refreshAll(); fitAll();
     showBanner('<span>👀 You opened a <b>shared copy</b>. Your own saved plan is untouched until you make an edit.</span><button id="bnKeep">Edit this copy</button><button id="bnBack">Back to my plan</button>');
@@ -1886,7 +2619,7 @@ function elemOfColor(hex) { // rough colour -> Wu Xing phase
 /* ====================== LAYOUT VALIDITY + FENG SHUI EVALUATION ====================== */
 const HEIGHT = { tv: 42, console: 30, sofa: 34, loveseat: 33, armchair: 32, rug: 0, coffee: 17, side: 24, dining: 30, chair: 32, bed: 26, nightstand: 24, dresser: 34, desk: 30, bookcase: 72, lamp: 60, tablelamp: 18, plant: 40, mirror: 48, art: 24, ottoman: 17 };
 const pieceHeight = p => p.h != null ? p.h : (HEIGHT[p.type] != null ? HEIGHT[p.type] : 30);
-const DOORISH = new Set(['door', 'angledDoor', 'opening', 'slider']);
+const DOORISH = new Set(['door', 'angledDoor', 'opening', 'slider', 'angledOpening']);
 const mid2 = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 const angDeg = (a, b) => Math.acos(clamp(V.dot(V.norm(a), V.norm(b)), -1, 1)) * 180 / Math.PI;
 function piecesIn(r, list) { const poly = roomPoly(r); return (list || S.pieces).filter(p => pointInPoly([p.x, p.y], poly)); }
@@ -2328,7 +3061,7 @@ function highlightOverlay() {
   for (const id of UI.hi) {
     let c = null, rad = 24;
     if (id.startsWith('corner:')) { const [x, y] = id.slice(7).split(',').map(Number); c = [x, y]; }
-    else { const p = S.pieces.find(q => q.id === id); if (p) { c = [p.x, p.y]; rad = Math.max(p.w, p.d) / 2 + 8; } else { const h = findFixture(id); if (h) { const R = h.f.corner && h.f.type !== 'angledDoor' && h.f.type !== 'angledWindow' || h.f.type === 'builtin' ? fixtureRect(h.r, h.f) : (g => [g.a, g.b])(gapBasis(h.r, h.f)); c = R.reduce((a, q) => [a[0] + q[0] / R.length, a[1] + q[1] / R.length], [0, 0]); rad = 22; } } }
+    else { const p = S.pieces.find(q => q.id === id); if (p) { c = [p.x, p.y]; rad = Math.max(p.w, p.d) / 2 + 8; } else { const h = findFixture(id); if (h) { const R = h.f.corner && !isCutFix(h.f) || h.f.type === 'builtin' ? fixtureRect(h.r, h.f) : (g => [g.a, g.b])(gapBasis(h.r, h.f)); c = R.reduce((a, q) => [a[0] + q[0] / R.length, a[1] + q[1] / R.length], [0, 0]); rad = 22; } } }
     if (c) o += `<circle class="hi" cx="${rnd1(c[0])}" cy="${rnd1(c[1])}" r="${rnd1(rad)}" fill="none" stroke="#ffd34d" stroke-width="2.4" pointer-events="none"><animate attributeName="stroke-opacity" values="1;.25;1" dur="1.2s" repeatCount="3"/></circle>`;
   }
   return `<g id="hiLayer" pointer-events="none">${o}</g>`;
@@ -2418,6 +3151,7 @@ function placeDecor(rng, ctx, placed, swings, deco, ev, extra) {
 const FAILS = {}; function fail(k) { FAILS[k] = (FAILS[k] || 0) + 1; return null; }
 function genLiving(rng, ctx, base, fixed, deco, th) {
   const placed = fixed.slice(), swings = allSwings(), out = [], strictGroup = [];
+  const orig0 = new Map(base.map(p => [p.id, { x: p.x, y: p.y, rot: p.rot }])); // original spots (fallback for extra side tables)
   const take = t => { const i = base.findIndex(p => p.type === t); return i < 0 ? null : base.splice(i, 1)[0]; };
   let tv = fixed.find(p => p.type === 'tv') || take('tv'), sofa = fixed.find(p => p.type === 'sofa') || take('sofa');
   if (!tv) tv = mkPiece('tv', { name: 'TV 75"', wallMount: true, diag: 75, auto: false });
@@ -2460,7 +3194,11 @@ function genLiving(rng, ctx, base, fixed, deco, th) {
     const c = V.add(V.add(G.c, V.mul(L, s * (sofa.w / 2 + (ends[s] ? 2 : 2) + T.w / 2))), V.mul(G.b, sofa.d / 2 - T.d / 2));
     Object.assign(T, { x: rnd1(c[0]), y: rnd1(c[1]), rot: sofa.rot });
     if (!conflictFor(T, placed, ctx, swings) && (placed.push(T), walkFine(ctx, placed) || (placed.pop(), false))) { out.push(T); endSides.push(T); } else if (!T.auto) sides.unshift(T); }
-  for (const T of sides) { if (!tryPlace(T, [...cornerCands(ctx, T.w, rng), ...wallCands(ctx, T, rng, 10, 1.0)], placed, ctx, swings)) return fail(5); out.push(T); }
+  for (const T of sides) {
+    if (tryPlace(T, [...cornerCands(ctx, T.w, rng), ...wallCands(ctx, T, rng, 10, 1.0)], placed, ctx, swings)) { out.push(T); continue; }
+    const o = orig0.get(T.id); if (o && tryPlace(T, [o], placed, ctx, swings)) { out.push(T); continue; } // keep it where the user had it, if still valid
+    return fail(5);
+  }
   // table lamps
   if (endSides.length && deco.lamps > 0) { const tl = mkPiece('tablelamp', {}); const T = pick(rng, endSides); Object.assign(tl, { x: T.x, y: T.y, rot: 0 }); if (!conflictFor(tl, placed, ctx, swings)) { placed.push(tl); out.push(tl); } }
   // 6. rug
@@ -2535,7 +3273,8 @@ function generateLayout(room, seed, strength, opts = {}) {
   const gen = { living: genLiving, bedroom: genBedroom, office: genOffice, dining: genDining }[kind] || genDecorOnly;
   const N = opts.tries || (strength >= 70 ? 64 : strength >= 30 ? 46 : 32), cands = []; let tried = 0;
   GEN_WALK = true;
-  for (let it = 0; it < N; it++) {
+  // N tries; if none was valid keep searching (deterministically) up to 3×N before giving up – tight rooms need more attempts
+  for (let it = 0; it < N || (!cands.length && it < N * 3); it++) {
     const rng = mulberry32((rng0() * 4294967296) >>> 0), base = movableAll.map(clone), fixed = fixedAll.map(clone);
     const res = withPieces(outside.concat(fixed), () => gen(rng, ctx, base, fixed, deco, th)); tried++;
     if (!res) continue;
@@ -2568,7 +3307,7 @@ function applyLayout(room, res, seed, strength) {
   S.feng.seed = seed; S.reasoning = { roomId: room.id, seed, strength, theme: S.vibe.theme || null, school: S.feng.school, valid: res.valid, tried: res.tried, rank: res.rank, score: res.score };
 }
 function randomizeRoom(opts = {}) {
-  const room = targetRoom(); if (!room) return;
+  const room = targetRoom(); if (!room) { toast('Draw a room first (Sketch mode)'); return; }
   const seed = opts.seed != null ? opts.seed : (parseInt(S.feng.seed) || 1), strength = opts.strength != null ? opts.strength : S.feng.strength;
   const t0 = performance.now(), res = generateLayout(room, seed, strength);
   if (!res.ok) { toast('No valid layout found for seed ' + seed + ' – try “Shuffle again”, or unlock some pieces', 4200); return false; }
@@ -2588,6 +3327,7 @@ function scoreColor(v) { return v >= 75 ? '#4caf72' : v >= 50 ? '#e3b341' : '#ff
 let fxCache = null; // last evaluation (refreshed on every refreshAll)
 function curFeng() { return fxCache && fxCache.room && S.rooms.includes(fxCache.room) ? fxCache : (fxCache = fengEval()); }
 function updateFengPill() {
+  if (!S.rooms.length) { fxCache = null; const el = $('#fengPill'); if (el) { el.textContent = 'Feng –'; el.style.color = ''; el.style.borderColor = ''; el.title = 'Draw a room to get a feng shui score'; } return; }
   fxCache = null; let ev; try { ev = fengEval(); } catch (e) { console.warn('feng eval failed', e); return; } fxCache = ev;
   const sd = $('#seedTag'); if (sd) sd.textContent = 'seed ' + S.feng.seed;
   const el = $('#fengPill'); if (!el) return; el.textContent = 'Feng ' + ev.score; el.style.color = scoreColor(ev.score); el.style.borderColor = scoreColor(ev.score); el.title = `Feng shui score for ${ev.room.name} (${SCHOOLS[ev.school].short}) – click for the checklist`;
@@ -2597,7 +3337,7 @@ function whyHTML(p) {
   const b = whyHere(p, curFeng());
   return `<ul class="why">${b.map(x => `<li class="k-${x.k}">${esc(x.t)} <span class="src">${esc(x.src || '')}</span></li>`).join('')}</ul>`;
 }
-function renderWhySel() { const el = $('#whyHere'); if (!el) return; const p = getSelPiece(); el.innerHTML = p ? `<details open><summary><b>Why here?</b></summary>${whyHTML(p)}</details>` : ''; }
+function renderWhySel() { const el = $('#whyHere'); if (!el) return; if (!S.rooms.length) { el.innerHTML = ''; return; } const p = getSelPiece(); el.innerHTML = p ? `<details open><summary><b>Why here?</b></summary>${whyHTML(p)}</details>` : ''; }
 function kuaState() { return getKua() || { year: '', gender: 'f', before: false }; }
 function fengHTML() {
   const ev = curFeng(), F = S.feng, kua = kuaState(), r = ev.room, sc = ev.score, school = F.school;
@@ -2633,6 +3373,7 @@ function fengHTML() {
 }
 function renderFeng() {
   const root = $('#tab-feng'); if (!root || UI.tab !== 'feng') return;
+  if (!S.rooms.length) { root.innerHTML = '<div class="card small">This plan has no rooms yet. Draw one in <b>Sketch</b> mode, then come back for the feng shui checklist.</div>'; return; }
   const a = document.activeElement; if (a && root.contains(a) && (a.tagName === 'INPUT' && a.type !== 'checkbox')) return;
   const sc = root.scrollTop, open = $$('details', root).map(d => d.open); root.innerHTML = fengHTML(); $$('details', root).forEach((d, i) => { if (open[i] != null && open.length === $$('details', root).length) d.open = open[i]; }); root.scrollTop = sc;
 }
@@ -2696,9 +3437,9 @@ function boot() {
   try { const u = JSON.parse(localStorage.getItem(CONFIG.keys.ui) || '{}'); if (typeof u.snap === 'boolean') UI.snap = u.snap; if (CONFIG.gridChoices.includes(u.grid)) UI.grid = u.grid; if (typeof u.badges === 'boolean') UI.badges = u.badges; } catch (e) { }
   if (/^#plan=/.test(location.hash)) UI.readonly = true;
   loadAutosaveOrDefault();
-  initUI(); initShare(); bindVibe(); bindRoomCard(); bindFeng();
+  initUI(); initShare(); bindVibe(); bindRoomCard(); bindFeng(); bindSketch(); bindVideo();
   histReset(); refreshAll(); fitAll(); renderLayouts();
-  window.__planner = { fengEval, layoutIssues, quickIssues, buildReasoning, whyHere, reasoningForExport, randomizeRoom, generateLayout, FAILS, roomCtx, piecesIn, tvViewers, walkStatus, getKua, kuaNumber, kuaInfo, highlightIds, openDesignNotes, get S() { return S; }, UI, CONFIG, hist, commit, importPlan, serializePlan, fitAll, render };
+  window.__planner = { fengEval, layoutIssues, quickIssues, buildReasoning, whyHere, reasoningForExport, randomizeRoom, generateLayout, FAILS, roomCtx, piecesIn, tvViewers, walkStatus, getKua, kuaNumber, kuaInfo, highlightIds, openDesignNotes, get S() { return S; }, UI, CONFIG, hist, commit, importPlan, serializePlan, fitAll, render, setMode, setSketchTool, sketchFinishWalls, polyToRoomSpec, analyzeFrames, openVideoModal, get videoState() { return VID; } };
 }
 boot();
 if (/^#plan=/.test(location.hash)) loadFromHash(true);
