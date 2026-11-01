@@ -189,12 +189,55 @@ ol.vm-stages li.done{color:var(--ok)}ol.vm-stages li.done::after{content:' ✓'}
 .vm-table{width:100%;border-collapse:collapse;font-size:13px}.vm-table td,.vm-table th{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
 .vm-table input{width:100%;min-width:90px}
 @media (max-width:820px){ .vm-choices{grid-template-columns:1fr} .vm-choice{min-height:84px} }
+/* ---- in-app editing (v3) ---- */
+.qbtn{min-width:30px;min-height:30px;padding:2px 8px;border-radius:99px;font-weight:700;color:var(--acc2)}
+#helpbar{display:none;align-items:center;gap:8px;padding:5px 10px;background:#102037;border-bottom:1px solid var(--line);font-size:12.5px;color:#cfd8ea}
+#helpbar.show{display:flex}
+#helpbar #helpText{flex:1;min-width:0}
+#helpbar #helpText b{color:var(--acc2)}
+#helpbar button{min-height:28px;padding:2px 9px}
+#edbar{display:none;align-items:center;gap:6px;padding:5px 8px;background:var(--panel2);border-bottom:1px solid var(--line);flex-wrap:wrap}
+#edbar.show{display:flex}
+#edbar .ebk{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--bg);background:var(--acc2);border-radius:6px;padding:2px 7px;font-weight:700}
+#edbar .ebk.wall{background:#ff8a3d}#edbar .ebk.fix{background:var(--acc)}
+#edbar input[type=text]{flex:1 1 150px;min-width:120px;max-width:280px}
+#edbar .small{max-width:420px}
+#edbar button{min-height:32px;padding:4px 9px}
+.mode-edit .wl{cursor:pointer}.mode-edit .wl.on{cursor:move}
+.wl.hov{stroke:#6ea8fe66!important}
+.rlab{cursor:text}
+.hd{transition:filter .1s}
+.hd.vh{cursor:move}
+.rs-n,.rs-s{cursor:ns-resize}.rs-e,.rs-w{cursor:ew-resize}.rs-nw,.rs-se{cursor:nwse-resize}.rs-ne,.rs-sw{cursor:nesw-resize}
+.hd:hover,.hd.hov{filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #ffd479);stroke:#ffd479}
+.fx.hov{filter:drop-shadow(0 0 2px #6ea8fe) drop-shadow(0 0 5px #6ea8fe)}
+#tagLayer{pointer-events:none}
+#cmdbox{position:absolute;right:10px;bottom:30px;z-index:6;display:flex;flex-direction:column;align-items:flex-end;gap:4px;max-width:calc(100% - 20px)}
+#cmdbox #cmdPanel{display:none;width:360px;max-width:100%;background:#101726ee;border:1px solid var(--acc);border-radius:10px;padding:6px 7px;box-shadow:0 6px 20px #0008}
+#cmdbox.open #cmdPanel{display:block}#cmdbox.open #cmdToggle{display:none}
+#cmdForm{display:flex;gap:5px;margin-top:4px}
+#cmdIn{flex:1;min-width:0}
+#cmdOut{min-height:16px;overflow:hidden;text-overflow:ellipsis}
+#cmdOut.ok{color:var(--ok)}#cmdOut.bad{color:var(--warn)}
+#cmdToggle{background:#101726e6;border-color:var(--acc)}
+#stage.cmd-open #hint{right:390px}
+#toast.act{pointer-events:auto}
+body.cmd-open #toast{bottom:auto;top:110px}
+#toast button{min-height:26px;padding:1px 9px;margin-left:8px}
+@media (max-width:820px){
+  #helpbar{font-size:12px;padding:4px 8px}
+  #edbar{padding:4px 6px;gap:4px}
+  #edbar .small{display:none}
+  #edbar input[type=text]{flex:1 1 120px;max-width:none}
+  #cmdbox{right:8px;bottom:44px}
+  #cmdbox #cmdPanel{width:calc(100vw - 16px)}
+}
 </style>
 </head>
 <body>
 <div id="app">
 <header id="top">
-  <div class="brand">🏠 Room Planner<small id="verTag"></small></div>
+  <div class="brand">🏠 Room Planner<small id="verTag"></small></div><button id="btnHelp" class="qbtn" title="Show quick tips" aria-label="Show quick tips">?</button>
   <div class="grp seg" id="modeSeg"><button id="mFurn" class="on" title="Move furniture">Furniture</button><button id="mEdit" title="Edit walls, doors, windows, built-ins">Edit Room</button><button id="mSketch" title="Sketch mode: draw rooms and walls to rough out a house layout">Sketch</button></div>
   <div class="grp"><button id="btnUndo" title="Undo (Ctrl+Z)">↶</button><button id="btnRedo" title="Redo (Ctrl+Y)">↷</button></div>
   <div class="grp"><button id="btnRot" title="Rotate selected piece 90° (R / double-click)">⟳ Rotate</button>
@@ -202,11 +245,13 @@ ol.vm-stages li.done{color:var(--ok)}ol.vm-stages li.done::after{content:' ✓'}
   <div class="grp"><button id="btnAddFix">+ Add fixture ▾</button><button id="btnAddPiece">+ Add piece ▾</button><button id="btnAddRoom">+ Add room ▾</button><button id="btnAddHall">+ Add hallway</button></div>
   <div class="grp" id="grpPlanOps"><button id="btnRotPlan" title="Rotate whole plan 90°">Rotate plan</button><button id="btnMirror" title="Mirror left↔right">Mirror</button><button id="btnFlip" title="Flip top↔bottom">Flip</button></div>
   <div class="grp"><button id="btnRand" title="Randomize the selected room from the active vibe (feng shui aware)">🎲 Randomize</button><button id="fengPill" class="pill" title="Feng shui score">Feng –</button><span id="seedTag" class="small" title="Randomizer seed (same seed + same plan = same layout)"></span></div>
-  <div class="grp"><button id="btnLight" title="Lighting overlay">💡 Lighting</button></div>
+  <div class="grp"><button id="btnLight" title="Lighting overlay">💡 Lighting</button><button id="btnTags" class="on" title="Show what an item is (wall, door, window…) when you hover or select it in Edit Room">🏷 Labels</button></div>
   <div class="grp"><button id="btnVideo" title="Beta: rough room-by-room layout from a walkthrough video (processed on this device)">🎥 Video walkthrough</button></div>
   <div class="grp"><button id="btnNew">New plan</button><button id="btnShare" title="Copy a link that contains this whole plan">🔗 Share</button></div>
   <div class="grp"><button id="btnReset">Reset</button><button id="btnExport">Export</button><button id="btnImport">Import</button><input type="file" id="fileImport" accept=".json,application/json" hidden></div>
 </header>
+<div id="helpbar" role="note" aria-live="polite"><span class="hb-ic">💡</span><span id="helpText"></span><button id="helpX" title="Hide tips (reopen with ?)" aria-label="Hide tips">✕</button></div>
+<div id="edbar" role="toolbar" aria-label="Edit selection"></div>
 <main>
   <section id="stage">
     <svg id="svg" xmlns="http://www.w3.org/2000/svg"><defs id="defs"></defs><g id="world"></g></svg>
@@ -216,6 +261,7 @@ ol.vm-stages li.done{color:var(--ok)}ol.vm-stages li.done::after{content:' ✓'}
     <div id="skEmpty"><div class="skcard"><b>Blank plan</b><div class="small">Rough out your home: drag rectangles for rooms, or click corners to draw walls. Then switch to <b>Furniture</b> to furnish it.</div><div class="row" style="justify-content:center"><button id="skEmptyRoom" class="primary">▭ Draw room</button><button id="skEmptyWalls">✎ Draw walls</button><button id="skEmptyVideo">🎥 Video walkthrough (beta)</button></div></div></div>
     <div id="zoomctl"><button id="zIn" title="Zoom in">+</button><button id="zOut" title="Zoom out">−</button><button id="zFit" title="Fit all" style="width:auto">Fit all</button></div>
     <div id="status"></div>
+    <div id="cmdbox"><button id="cmdToggle" title="Type an edit in plain words" aria-label="Open command box">💬 Command</button><div id="cmdPanel"><div id="cmdOut" class="small" aria-live="polite">Type an edit in plain words, e.g. “rename the hallway to first bedroom”.</div><form id="cmdForm" autocomplete="off"><input id="cmdIn" type="text" placeholder="e.g. straighten the living room" aria-label="Command" enterkeyhint="send"><button type="submit" id="cmdSend" class="primary">Send</button><button type="button" id="cmdMin" title="Collapse" aria-label="Collapse command box">▾</button></form></div></div>
   </section>
   <aside id="side">
     <nav id="tabs"><button data-tab="plan" class="on">Plan</button><button data-tab="vibe">Vibe &amp; Shop</button><button data-tab="feng">Feng Shui</button></nav>
@@ -381,6 +427,7 @@ function fixSelection() {
   if (s.kind === 'fixture' && !findFixture(s.id)) UI.sel = { kind: null, id: null };
   if (s.kind === 'room' && !S.rooms.find(r => r.id === s.id)) UI.sel = { kind: null, id: null };
   if (s.kind === 'light' && !S.lights.find(l => l.id === s.id)) UI.sel = { kind: null, id: null };
+  if ((s.kind === 'wall' || s.kind === 'corner') && (!S.rooms.find(r => r.id === s.id) || (s.kind === 'wall' ? s.e : s.v) >= roomPoly(S.rooms.find(r => r.id === s.id)).length)) UI.sel = { kind: null, id: null };
   if (s.kind === 'skwall' && !(S.sketchWalls || []).find(w => w.id === s.id)) UI.sel = { kind: null, id: null };
 }
 let saveTimer = null;
@@ -394,7 +441,7 @@ function saveAutosave() {
   try { const o = serializePlan(); localStorage.setItem(CONFIG.keys.autosave, JSON.stringify(o)); } catch (e) { }
 }
 function saveUI() { try { localStorage.setItem(CONFIG.keys.ui, JSON.stringify({ snap: UI.snap, grid: UI.grid, tab: UI.tab, badges: UI.badges })); } catch (e) { } }
-function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
+function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.classList.remove('act'); t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
 function modal(html, buttons) {
   const m = $('#modal'), b = $('.box', m); b.innerHTML = html + '<div class="btns"></div>';
   const bb = $('.btns', b);
@@ -422,13 +469,17 @@ function closeMenu() { const m = $('#popmenu'); if (m) m.remove(); document.remo
 const CORNERS = ['tl', 'tr', 'br', 'bl'];
 function findFixture(id) { for (const r of S.rooms) { const f = r.fixtures.find(f => f.id === id); if (f) return { f, r }; } return null; }
 function roomById(id) { return S.rooms.find(r => r.id === id); }
+// optional per-room outline: r.pts = [[dx,dy],...] relative to r.x/r.y (bbox = x,y,w,d). Rooms without pts are plain rects (+ notch / chamfer cuts) exactly as before.
+const hasPts = r => !!(r && Array.isArray(r.pts) && r.pts.length >= 3);
 function cornerCuts(r) {
   const c = { tl: null, tr: null, br: null, bl: null };
+  if (hasPts(r)) return c; // reshaped room: cuts are baked into the outline
   if (r.shape === 'L' && r.notch) c[r.notch.corner] = { a: r.notch.a, b: r.notch.b, kind: 'notch' };
   for (const f of r.fixtures) if (f.corner && isCutFix(f) && !c[f.corner]) c[f.corner] = { a: f.a, b: f.b, kind: 'chamfer', fid: f.id };
   return c;
 }
 function roomPoly(r) {
+  if (hasPts(r)) return r.pts.map(q => [r.x + q[0], r.y + q[1]]);
   const { x, y, w, d } = r, c = cornerCuts(r), P = [];
   let k;
   if (!(k = c.tl)) P.push([x, y]); else if (k.kind === 'chamfer') P.push([x, y + k.b], [x + k.a, y]); else P.push([x, y + k.b], [x + k.a, y + k.b], [x + k.a, y]);
@@ -456,6 +507,7 @@ function roomSqft(r) { return polyArea(roomPoly(r)) / 144; }
 function roomAt(x, y) { for (let i = S.rooms.length - 1; i >= 0; i--) { const r = S.rooms[i]; if (pointInPoly([x, y], roomPoly(r))) return r; } return null; }
 function roomBBox(r) { return { x: r.x, y: r.y, w: r.w, d: r.d }; }
 function roomRects(r) { // rectangles covering the room (for overlap tests)
+  if (hasPts(r)) return [{ x: r.x, y: r.y, w: r.w, d: r.d }];
   if (r.shape === 'L' && r.notch) {
     const n = r.notch, { x, y, w, d } = r;
     switch (n.corner) {
@@ -487,6 +539,20 @@ function wallRange(r, wall) {
   }
 }
 function wallBasis(r, wall, pos, len) {
+  if (hasPts(r)) return ptsWallBasis(r, wall, pos, len);
+  return rectWallBasis(r, wall, pos, len);
+}
+// reshaped room: put the wall item on the actual (possibly slanted) wall facing that side; falls back to the bounding box
+function ptsWallBasis(r, wall, pos, len) {
+  const g = rectWallBasis(r, wall, pos, len), P = roomPoly(r), hor = wall === 'top' || wall === 'bottom', ax = hor ? 1 : 0, sgn = (wall === 'top' || wall === 'left') ? 1 : -1;
+  const E = [];
+  for (let i = 0; i < P.length; i++) { const p = P[i], q = P[(i + 1) % P.length], u = V.norm(V.sub(q, p)); let n = [-u[1], u[0]]; const m = V.mul(V.add(p, q), .5); if (!pointInPoly(V.add(m, V.mul(n, .5)), P)) n = [-n[0], -n[1]]; if (n[ax] * sgn > 0.3) E.push({ p, q }); }
+  const proj = pt => { const t0 = pt[1 - ax]; let best = null; for (const e of E) { const lo = Math.min(e.p[1 - ax], e.q[1 - ax]), hi = Math.max(e.p[1 - ax], e.q[1 - ax]); if (t0 < lo - .01 || t0 > hi + .01 || hi - lo < .01) continue; const k = (t0 - e.p[1 - ax]) / (e.q[1 - ax] - e.p[1 - ax]), v = e.p[ax] + k * (e.q[ax] - e.p[ax]); if (!best || v * sgn < best * sgn) best = v; } if (best == null) return pt; const o = pt.slice(); o[ax] = best; return o; };
+  const a = proj(g.a), b = proj(g.b); if (V.len(V.sub(b, a)) < .01) return g;
+  const u = V.norm(V.sub(b, a)); let n = [-u[1], u[0]]; if (V.dot(n, g.n) < 0) n = [-n[0], -n[1]];
+  return { a, b, u, n };
+}
+function rectWallBasis(r, wall, pos, len) {
   const { x, y, w, d } = r;
   switch (wall) {
     case 'top': return { a: [x + pos, y], b: [x + pos + len, y], u: [1, 0], n: [0, 1] };
@@ -500,8 +566,13 @@ function cornerSigns(c) { return { tl: [1, 1], tr: [-1, 1], br: [-1, -1], bl: [1
 // diagonal of an angled fixture: from the end on the horizontal wall (H) to the end on the vertical wall (V)
 function diagBasis(r, f) {
   const cp = cornerPoint(r, f.corner), sg = cornerSigns(f.corner);
-  const H = [cp[0] + sg[0] * f.a, cp[1]], Vv = [cp[0], cp[1] + sg[1] * f.b];
-  const L = Math.hypot(f.a, f.b), u = V.norm(V.sub(Vv, H));
+  let H = [cp[0] + sg[0] * f.a, cp[1]], Vv = [cp[0], cp[1] + sg[1] * f.b];
+  if (hasPts(r)) { // reshaped room: follow the slanted wall nearest this corner (else keep the virtual chamfer)
+    const P = roomPoly(r); let best = null;
+    for (let i = 0; i < P.length; i++) { const p = P[i], q = P[(i + 1) % P.length]; if (Math.abs(p[0] - q[0]) < .01 || Math.abs(p[1] - q[1]) < .01) continue; const m = V.mul(V.add(p, q), .5), dd = V.len(V.sub(m, cp)); if (dd < Math.max(f.a, f.b) * 1.5 + 24 && (!best || dd < best.d)) best = { d: dd, p, q }; }
+    if (best) { const hp = Math.abs(best.p[1] - cp[1]) <= Math.abs(best.q[1] - cp[1]); H = hp ? best.p : best.q; Vv = hp ? best.q : best.p; }
+  }
+  const L = V.len(V.sub(Vv, H)) || Math.hypot(f.a, f.b), u = V.norm(V.sub(Vv, H));
   let n = [-u[1], u[0]]; const ctr = [r.x + r.w / 2, r.y + r.d / 2];
   if (V.dot(n, V.sub(ctr, H)) < 0) n = [-n[0], -n[1]];
   return { H, V: Vv, L, u, n };
@@ -606,7 +677,8 @@ function xformRoom(op, r, bb) {
   nr.x = Math.min(c1[0], c2[0]); nr.y = Math.min(c1[1], c2[1]); nr.w = op === 'rot' ? r.d : r.w; nr.d = op === 'rot' ? r.w : r.d;
   nr.fixtures = r.fixtures.map(f => xformFixture(op, f, r.w, r.d));
   if (r.notch) { const n = r.notch; let c = n.corner, a = n.a, b = n.b; if (op === 'rot') { c = CORNER_ROT[c]; a = n.b; b = n.a; } else if (op === 'mirror') c = { tl: 'tr', tr: 'tl', br: 'bl', bl: 'br' }[c]; else c = { tl: 'bl', bl: 'tl', tr: 'br', br: 'tr' }[c]; nr.notch = { corner: c, a, b }; }
-  if (r.wallLabels) { const wl = {}, W = r.wallLabels; for (const k of Object.keys(W)) { let nk = k; if (op === 'rot') nk = WALL_ROT[k]; else if (op === 'mirror') nk = k === 'left' ? 'right' : k === 'right' ? 'left' : k; else nk = k === 'top' ? 'bottom' : k === 'bottom' ? 'top' : k; wl[nk] = W[k]; } nr.wallLabels = wl; }
+  if (hasPts(r)) nr.pts = r.pts.map(q => op === 'rot' ? [r.d - q[1], q[0]] : op === 'mirror' ? [r.w - q[0], q[1]] : [q[0], r.d - q[1]]);
+  if (r.wallLabels) { const wl = {}, W = r.wallLabels; for (const k of Object.keys(W)) { let nk = k; if (op === 'rot') nk = WALL_ROT[k] || k; else if (op === 'mirror') nk = k === 'left' ? 'right' : k === 'right' ? 'left' : k; else nk = k === 'top' ? 'bottom' : k === 'bottom' ? 'top' : k; wl[nk] = W[k]; } nr.wallLabels = wl; }
   return nr;
 }
 function xformPiece(op, p, bb) {
@@ -827,6 +899,7 @@ function roomLabels() {
     for (let k = 0; k < 8; k++) { const y = r.y - fs * off; box = { x: r.x + 2, y: y - th, w: tw, h: th }; if (!boxes.some(b => b.x < box.x + box.w && box.x < b.x + b.w && b.y < box.y + box.h && box.y < b.y + b.h)) break; off += 1.5; }
     boxes.push(box);
     o += textHalo(r.x + 2, r.y - fs * off, txt, fs * 1.15, { anchor: 'start', fill: '#e6ebf5', style: 'font-weight:600' });
+    if (UI.mode !== 'sketch') o += `<rect class="rlab" data-kind="rlabel" data-id="${r.id}" x="${rnd1(box.x - 1)}" y="${rnd1(box.y - fs * .1)}" width="${rnd1(Math.min(box.w, fs * 1.15 * 0.56 * (r.name.length + 2)) + 2)}" height="${rnd1(box.h + fs * .3)}" fill="transparent"><title>Tap to rename</title></rect>`;
     const wl = r.wallLabels || {};
     const place = (txt, x, y, rot) => { if (!txt) return ''; if (roomAt(x, y) || S.rooms.some(q => q.id !== r.id && pointInPoly([x, y], roomPoly(q)))) return ''; return textHalo(x, y, txt, fs * .85, { fill: '#8fa0bf', style: 'font-style:italic', rot }); };
     const r2 = (a, b) => [a, b];
@@ -834,6 +907,7 @@ function roomLabels() {
     if (wl.bottom) o += place(wl.bottom, r.x + r.w / 2, r.y + r.d + fs * 1.8, 0);
     if (wl.left) o += place(wl.left, r.x - fs * .9, r.y + r.d / 2, -90);
     if (wl.right) o += place(wl.right, r.x + r.w + fs * 1.5, r.y + r.d / 2, 90);
+    { const P = roomPoly(r); for (let i = 0; i < P.length; i++) { const t = wl['e' + i]; if (!t) continue; const p = P[i], q = P[(i + 1) % P.length], m = V.mul(V.add(p, q), .5), u = V.norm(V.sub(q, p)); let n = [-u[1], u[0]]; if (pointInPoly(V.add(m, V.mul(n, 3)), P)) n = [-n[0], -n[1]]; const c = V.add(m, V.mul(n, fs * 1.2)); let ang = Math.atan2(u[1], u[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180; o += place(t, c[0], c[1], rnd1(ang)); } }
   }
   return o;
 }
@@ -846,7 +920,7 @@ function kelvinColor(k) { // rough colour temperature -> hex
 }
 function handles() {
   if (UI.mode !== 'edit' && !(UI.mode === 'sketch' && UI.sk && UI.sk.tool === 'select')) return '';
-  const z = UI.view.z, hr = Math.max(5, 9 / z); let o = '';
+  const z = UI.view.z, coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches, hr = Math.max(5, (coarse ? 14 : 9) / z); let o = '';
   const H = (x, y, id, h, extra = '') => `<circle class="hd" data-kind="handle" data-h="${h}" data-id="${id}" cx="${rnd1(x)}" cy="${rnd1(y)}" r="${rnd1(hr)}" fill="#6ea8fe" stroke="#fff" stroke-width="${rnd1(1.4 / z + .3)}" ${extra}/>`;
   if (UI.sel.kind === 'fixture' && UI.mode === 'edit') {
     const hit = findFixture(UI.sel.id); if (!hit) return '';
@@ -860,10 +934,16 @@ function handles() {
       if (f.depth) { const m = V.add(V.mul(V.add(g.a, g.b), .5), V.mul(g.n, f.depth)); o += H(m[0], m[1], f.id, 'depth'); }
     }
   }
-  if (UI.sel.kind === 'room') {
+  const editRoom = UI.mode === 'edit' && ['room', 'wall', 'corner'].includes(UI.sel.kind);
+  if (UI.sel.kind === 'room' || editRoom) {
     const r = roomById(UI.sel.id); if (r) {
       const xs = [r.x, r.x + r.w / 2, r.x + r.w], ys = [r.y, r.y + r.d / 2, r.y + r.d];
-      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { if (i === 1 && j === 1) continue; const nm = (j === 0 ? 'n' : j === 2 ? 's' : '') + (i === 0 ? 'w' : i === 2 ? 'e' : ''); o += `<rect class="hd" data-kind="handle" data-h="room-${nm}" data-id="${r.id}" x="${rnd1(xs[i] - hr)}" y="${rnd1(ys[j] - hr)}" width="${rnd1(hr * 2)}" height="${rnd1(hr * 2)}" rx="${rnd1(hr * .3)}" fill="#ffd479" stroke="#fff" stroke-width="${rnd1(1.4 / z + .3)}"/>`; }
+      // Edit Room: corner resize squares sit just outside the corners so the round corner (reshape) handles stay free
+      const off = UI.mode === 'edit' ? hr * 2.3 : 0;
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { if (i === 1 && j === 1) continue;
+        if (editRoom && ((i !== 1 && j !== 1 && coarse) || (i === 1 && r.w < hr * 6) || (j === 1 && r.d < hr * 6))) continue; // keep touch handles from piling up on small rooms
+        const nm = (j === 0 ? 'n' : j === 2 ? 's' : '') + (i === 0 ? 'w' : i === 2 ? 'e' : ''); const ox = (i !== 1 && j !== 1) ? (i - 1) * off : 0, oy = (i !== 1 && j !== 1) ? (j - 1) * off : 0; o += `<rect class="hd rs rs-${nm}" data-kind="handle" data-h="room-${nm}" data-id="${r.id}" x="${rnd1(xs[i] + ox - hr)}" y="${rnd1(ys[j] + oy - hr)}" width="${rnd1(hr * 2)}" height="${rnd1(hr * 2)}" rx="${rnd1(hr * .3)}" fill="#ffd479" stroke="#fff" stroke-width="${rnd1(1.4 / z + .3)}"/>`; }
+      if (editRoom) roomPoly(r).forEach((p, i) => { const on = UI.sel.kind === 'corner' && UI.sel.v === i; o += `<circle class="hd vh${on ? ' on' : ''}" data-kind="handle" data-h="v-${i}" data-id="${r.id}" cx="${rnd1(p[0])}" cy="${rnd1(p[1])}" r="${rnd1(hr * .95)}" fill="${on ? '#ff8a3d' : '#fff'}" stroke="#ff8a3d" stroke-width="${rnd1(2 / z + .4)}"/>`; });
     }
   }
   return o;
@@ -954,6 +1034,8 @@ function deleteSelected() {
   else if (k === 'fixture') { for (const r of S.rooms) r.fixtures = r.fixtures.filter(f => f.id !== id); }
   else if (k === 'light') S.lights = S.lights.filter(l => l.id !== id);
   else if (k === 'room') { if (UI.mode === 'sketch' && typeof sketchDeleteRoom === 'function') return sketchDeleteRoom(id); if (typeof deleteRoomConfirm === 'function') return deleteRoomConfirm(id); return; }
+  else if (k === 'corner') { if (typeof removeCorner === 'function') removeCorner(); return; }
+  else if (k === 'wall') { toast('Walls can\'t be deleted on their own – use Remove corner, or Delete room'); return; }
   else if (k === 'skwall') S.sketchWalls = (S.sketchWalls || []).filter(w => w.id !== id);
   UI.sel = { kind: null, id: null }; commit();
 }
@@ -963,9 +1045,11 @@ function duplicateSelected() {
 }
 function gsnap(v) { return UI.snap ? snapTo(v, UI.grid) : Math.round(v); }
 
+// distance along a wall (wall positions are measured along the room's x or y axis; identical to the old dot product for straight walls)
+const alongWall = (wall, P, a) => (wall === 'top' || wall === 'bottom') ? P[0] - a[0] : P[1] - a[1];
 function startFixtureDrag(f, r, w) {
   const d = { type: 'fixture', id: f.id, moved: false };
-  if (!f.corner) { const b = wallBasis(r, f.wall, 0, 1); d.off = V.dot(V.sub(w, b.a), b.u) - f.pos; }
+  if (!f.corner) { const b = wallBasis(r, f.wall, 0, 1); d.off = alongWall(f.wall, w, b.a) - f.pos; }
   return d;
 }
 function nearestWallAny(P, tryRoom) {
@@ -973,7 +1057,7 @@ function nearestWallAny(P, tryRoom) {
   for (const r of S.rooms) for (const wall of ['top', 'right', 'bottom', 'left']) {
     const [lo, hi] = wallRange(r, wall); if (hi - lo < 6) continue;
     const g = wallBasis(r, wall, lo, hi - lo), dd = distPointSeg(P, g.a, g.b);
-    const score = dd.d - (pointInPoly(P, roomPoly(r)) ? 1.5 : 0); if (!best || score < best.score - 0.001) best = { score, d: dd.d, r, wall, lo, hi, g, s: lo + V.dot(V.sub(P, g.a), g.u) };
+    const score = dd.d - (pointInPoly(P, roomPoly(r)) ? 1.5 : 0); if (!best || score < best.score - 0.001) best = { score, d: dd.d, r, wall, lo, hi, g, s: lo + alongWall(wall, P, g.a) };
   }
   return best;
 }
@@ -1000,6 +1084,7 @@ function moveFixture(d, w) {
 }
 function dragHandle(d, w) {
   const hit = findFixture(d.id) || null;
+  if (d.h.startsWith('v-')) { if (typeof vertexDrag === 'function') vertexDrag(d, w); return; }
   if (d.h.startsWith('room-')) { if (typeof resizeRoomDrag === 'function') resizeRoomDrag(d, w); return; }
   if (!hit) return; const { f, r } = hit;
   if (f.corner) {
@@ -1008,7 +1093,7 @@ function dragHandle(d, w) {
     if (d.h === 'b') f.b = clamp(gsnap(Math.abs(w[1] - cp[1])), 6, r.d - 12);
     return;
   }
-  const [lo, hi] = wallRange(r, f.wall), g = wallBasis(r, f.wall, 0, 1), s = V.dot(V.sub(w, g.a), g.u);
+  const [lo, hi] = wallRange(r, f.wall), g = wallBasis(r, f.wall, 0, 1), s = alongWall(f.wall, w, g.a);
   if (d.h === 'start') { const end = f.pos + f.len, ns = clamp(gsnap(s), lo, end - 6); f.len = end - ns; f.pos = ns; }
   else if (d.h === 'end') { f.len = clamp(gsnap(s) - f.pos, 6, hi - f.pos); }
   else if (d.h === 'depth') { f.depth = clamp(gsnap(V.dot(V.sub(w, g.a), g.n)), 1, 120); }
@@ -1028,6 +1113,7 @@ function onDown(e) {
   if (ptrs.size > 2) return;
   const t = e.target.closest ? e.target.closest('[data-kind]') : null, kind = t ? t.dataset.kind : 'bg', id = t ? t.dataset.id : null;
   const w = evWorld(e), sx = e.clientX, sy = e.clientY;
+  if (typeof setHover === 'function') setHover(e.target, true);
   drag = { kind, id, sx, sy, moved: false, w0: w, view0: Object.assign({}, UI.view), pointerType: e.pointerType };
   if (UI.space) { drag.type = 'pan'; return; }
   if (UI.mode === 'sketch' && typeof sketchDown === 'function' && sketchDown(e, drag, t)) return;
@@ -1040,6 +1126,10 @@ function onDown(e) {
     UI.sel = { kind: 'fixture', id }; Object.assign(drag, startFixtureDrag(h.f, h.r, w), { kind, id }); drag.type = 'fixture'; refreshAll(true);
   } else if (kind === 'handle' && (UI.mode === 'edit' || (UI.mode === 'sketch' && String(t.dataset.h).startsWith('room-')))) {
     drag.type = 'handle'; drag.h = t.dataset.h;
+    if (drag.h.startsWith('v-')) { UI.sel = { kind: 'corner', id, v: +drag.h.slice(2) }; refreshAll(true); }
+  } else if (kind === 'wall' && UI.mode === 'edit') {
+    const e0 = +t.dataset.e; drag.e = e0;
+    drag.type = (UI.sel.kind === 'wall' && UI.sel.id === id && UI.sel.e === e0) ? 'wall' : 'pan';
   } else if (kind === 'light' && UI.light) {
     UI.sel = { kind: 'light', id }; const l = S.lights.find(q => q.id === id); drag.type = 'light'; drag.off = [l.x - w[0], l.y - w[1]]; refreshAll(true);
   } else if (kind === 'room' && ((UI.mode === 'edit' && UI.sel.kind === 'room' && UI.sel.id === id) || UI.mode === 'sketch') && typeof startRoomDrag === 'function') {
@@ -1055,6 +1145,7 @@ function onMove(e) {
     UI.view.z = nz; UI.view.x = pinch.w[0] - mx / nz; UI.view.y = pinch.w[1] - my / nz; render(); return;
   }
   if (UI.mode === 'sketch' && typeof sketchHover === 'function') sketchHover(e, [wx, wy]);
+  if (!drag && e.pointerType !== 'touch' && typeof setHover === 'function') setHover(e.target);
   if (!drag) return;
   const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
   if (!drag.moved && Math.hypot(dx, dy) < 4) return;
@@ -1074,6 +1165,7 @@ function onMove(e) {
     case 'handle': dragHandle(drag, w); render(); break;
     case 'light': { const l = S.lights.find(q => q.id === drag.id); if (l) { l.x = gsnap(w[0] + drag.off[0]); l.y = gsnap(w[1] + drag.off[1]); } render(); break; }
     case 'room': dragRoomMove(drag, w); render(); break;
+    case 'wall': if (typeof wallDrag === 'function') wallDrag(drag, w); render(); break;
     default: if (typeof sketchDragMove === 'function') sketchDragMove(drag, w, e);
   }
 }
@@ -1083,10 +1175,13 @@ function onUp(e) {
   const d = drag; drag = null; if (!d) return;
   if (d.type && d.type.startsWith('sk') && typeof sketchUp === 'function') { sketchUp(d, e); return; }
   if (d.moved) {
+    if (typeof finishShapeDrag === 'function' && (d.type === 'wall' || (d.type === 'handle' && String(d.h).startsWith('v-')))) finishShapeDrag(d);
     if (d.type !== 'pan') commit();
     saveUI(); return;
   }
   // tap
+  if (d.kind === 'rlabel' && typeof tapRoomLabel === 'function') { tapRoomLabel(d.id); return; }
+  if (d.kind === 'wall' && UI.mode === 'edit') { UI.sel = { kind: 'wall', id: d.id, e: d.e }; refreshAll(); return; }
   if (d.type === 'piece') {
     const now = performance.now();
     if (lastTap.id === d.id && now - lastTap.t < 450) { lastTap = { id: null, t: 0 }; UI.sel = { kind: 'piece', id: d.id }; rotateSelected(); return; }
@@ -1141,7 +1236,7 @@ const FIX_DEFS = {
   windowC: { type: 'window', label: 'Window with curtain', len: 36, curtain: true, name: 'Window + curtain' }
 };
 function targetRoom() {
-  if (UI.sel.kind === 'room') return roomById(UI.sel.id);
+  if (UI.sel.kind === 'room' || UI.sel.kind === 'wall' || UI.sel.kind === 'corner') return roomById(UI.sel.id);
   if (UI.sel.kind === 'fixture') { const h = findFixture(UI.sel.id); if (h) return h.r; }
   if (UI.sel.kind === 'piece') { const p = getSelPiece(); const r = p && roomAt(p.x, p.y); if (r) return r; }
   return S.rooms.find(r => r.id === UI.curRoom) || S.rooms[0];
@@ -1186,6 +1281,7 @@ function setMode(m) {
   if (UI.mode === 'sketch' && m !== 'sketch' && typeof sketchLeave === 'function') sketchLeave();
   UI.mode = m; $('#mFurn').classList.toggle('on', m === 'furniture'); $('#mEdit').classList.toggle('on', m === 'edit'); const ms = $('#mSketch'); if (ms) ms.classList.toggle('on', m === 'sketch');
   if (UI.sel.kind === 'skwall' && m !== 'sketch') UI.sel = { kind: null, id: null };
+  if ((UI.sel.kind === 'wall' || UI.sel.kind === 'corner') && m !== 'edit') UI.sel = UI.sel.id ? { kind: 'room', id: UI.sel.id } : { kind: null, id: null };
   document.body.classList.toggle('sketching', m === 'sketch'); refreshAll();
 }
 function numInput(prop, v, step = 1, min = '', max = '') { return `<input type="number" data-p="${prop}" value="${rnd1(v)}" step="${step}" ${min !== '' ? `min="${min}"` : ''} ${max !== '' ? `max="${max}"` : ''}>`; }
@@ -1230,6 +1326,7 @@ function selectionHTML() {
     <div class="row"><label>Radius″</label>${numInput('r', l.r || 90, 5, 20, 300).replace('data-p', 'data-l')}</div><div class="row"><button class="danger" data-act="del">Delete</button></div>`;
   }
   if (k === 'room') return roomSelHTML ? roomSelHTML() : 'Room selected.';
+  if ((k === 'wall' || k === 'corner') && typeof edSelHTML === 'function') return edSelHTML();
   return 'Nothing selected. Tap a piece (Furniture mode) or a fixture (Edit Room mode).';
 }
 let roomSelHTML = null;
@@ -1326,7 +1423,8 @@ function migratePlan(o) {
   else if (o.room && typeof o.room === 'object') { rooms = [Object.assign(newRoom({}), clone(o.room), { id: 'r1', x: o.room.x || 0, y: o.room.y || 0, type: o.room.type || 'living' })]; }
   else throw new Error('Missing rooms');
   if (!Array.isArray(o.pieces)) throw new Error('Missing pieces');
-  rooms.forEach(r => { r.fixtures = (r.fixtures || []).map(f => Object.assign({ id: uid('f_') }, f)); r.wallLabels = r.wallLabels || {}; });
+  rooms.forEach(r => { r.fixtures = (r.fixtures || []).map(f => Object.assign({ id: uid('f_') }, f)); r.wallLabels = r.wallLabels || {};
+    if (r.pts != null && !(Array.isArray(r.pts) && r.pts.length >= 3 && r.pts.every(q => Array.isArray(q) && Number.isFinite(q[0]) && Number.isFinite(q[1])))) delete r.pts; });
   const P = basePlan(rooms, clone(o.pieces).map(p => Object.assign({ id: uid('p_'), rot: 0 }, p)), clone(o.lights || []));
   P.openPairs = Array.isArray(o.openPairs) ? clone(o.openPairs) : [];
   P.sketchWalls = Array.isArray(o.sketchWalls) ? o.sketchWalls.filter(w => w && Array.isArray(w.a) && Array.isArray(w.b) && [w.a[0], w.a[1], w.b[0], w.b[1]].every(Number.isFinite)).map(w => ({ id: w.id || uid('w_'), a: [w.a[0], w.a[1]], b: [w.b[0], w.b[1]] })) : [];
@@ -1746,6 +1844,7 @@ function resizeRoomDrag(d, w) {
   if (h.includes('n')) T = Math.min(edgeSnap(w[1], 'y', r.id), B - M);
   if (h.includes('s')) B = Math.max(edgeSnap(w[1], 'y', r.id), T + M);
   const cand = clone(r0); cand.x = L; cand.y = T; cand.w = R - L; cand.d = B - T;
+  if (hasPts(r0)) cand.pts = r0.pts.map(q => [rnd1(q[0] * cand.w / r0.w), rnd1(q[1] * cand.d / r0.d)]);
   if (cand.notch) { cand.notch.a = Math.min(cand.notch.a, cand.w - 12); cand.notch.b = Math.min(cand.notch.b, cand.d - 12); }
   const dx = L - r0.x, dy = T - r0.y;
   cand.fixtures.forEach(f => { if (f.corner) return; if ((f.wall === 'top' || f.wall === 'bottom') && dx) f.pos -= dx; if ((f.wall === 'left' || f.wall === 'right') && dy) f.pos -= dy; });
@@ -1762,6 +1861,7 @@ function deleteRoomConfirm(id) {
     S.lights = S.lights.filter(l => !pointInPoly([l.x, l.y], roomPoly(r)));
     S.rooms = S.rooms.filter(x => x.id !== id); S.openPairs = S.openPairs.filter(k => !k.split('|').includes(id));
     UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0] ? S.rooms[0].id : null; commit();
+    if (typeof undoToast === 'function') undoToast('Deleted “' + r.name + '”');
   });
 }
 function duplicateRoom(id) {
@@ -1784,7 +1884,7 @@ function opRoom(op, id) {
 }
 /* ---- rooms panel ---- */
 const ROOM_TYPES = ['living', 'bedroom', 'kitchen', 'bathroom', 'dining', 'closet', 'office', 'hallway', 'room'];
-function selRoom() { return UI.sel.kind === 'room' ? roomById(UI.sel.id) : (roomById(UI.curRoom) || S.rooms[0]); }
+function selRoom() { return (UI.sel.kind === 'room' || UI.sel.kind === 'wall' || UI.sel.kind === 'corner') ? roomById(UI.sel.id) : (roomById(UI.curRoom) || S.rooms[0]); }
 roomSelHTML = function () { const r = roomById(UI.sel.id); return r ? `<b>${esc(r.name)}</b> · ${fmtIn(r.w)}×${fmtIn(r.d)} · ${Math.round(roomSqft(r) * 10) / 10} sq ft<div class="small">Edit Room mode: drag the room to move it (snaps to the grid and neighbours' edges); drag the yellow handles to resize. Use the Rooms panel below for rename, rotate, mirror, duplicate, delete and open plan.</div>` : ''; };
 roomCardHTML = function () {
   const tot = S.rooms.reduce((a, r) => a + roomSqft(r), 0), r = selRoom(); if (!r) return '';
@@ -1811,9 +1911,10 @@ function bindRoomCard() {
     const k = t.dataset.r; if (!k) return; const r = selRoom(); if (!r) return;
     if (k === 'name') r.name = t.value || r.name; else if (k === 'type') r.type = t.value;
     else if (k === 'w' || k === 'd') {
-      const v = clamp(parseFloat(t.value) || r[k], CONFIG.minRoom, CONFIG.maxRoom), old = r[k]; r[k] = v;
+      const v = clamp(parseFloat(t.value) || r[k], CONFIG.minRoom, CONFIG.maxRoom), old = r[k], oldPts = r.pts ? clone(r.pts) : null; r[k] = v;
+      if (hasPts(r)) r.pts = r.pts.map(q => k === 'w' ? [rnd1(q[0] * v / old), q[1]] : [q[0], rnd1(q[1] * v / old)]);
       if (r.notch) { r.notch.a = Math.min(r.notch.a, r.w - 12); r.notch.b = Math.min(r.notch.b, r.d - 12); }
-      if (overlapsAny(r)) { r[k] = old; toast('That size would overlap a neighbouring room'); } else clampFixtures(r);
+      if (overlapsAny(r)) { r[k] = old; if (oldPts) r.pts = oldPts; toast('That size would overlap a neighbouring room'); } else clampFixtures(r);
     }
     else if (k === 'ncorner') r.notch.corner = t.value; else if (k === 'na') r.notch.a = clamp(parseFloat(t.value) || 12, 12, r.w - 12); else if (k === 'nb') r.notch.b = clamp(parseFloat(t.value) || 12, 12, r.d - 12);
     else if (k.startsWith('wl-')) { r.wallLabels = r.wallLabels || {}; r.wallLabels[k.slice(3)] = t.value; }
@@ -2475,6 +2576,571 @@ function bindVideo() {
   ['#btnVideo', '#btnVideoCard', '#skVideo', '#skEmptyVideo'].forEach(s => { const b = $(s); if (b) b.onclick = open; });
   $('#vmodal').addEventListener('click', e => { if (e.target.id === 'vmodal' && VID.view !== 'progress') closeVideoModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#vmodal').classList.contains('show')) { if (VID.view === 'progress') { VID.cancel = true; toast('Video analysis cancelled'); } closeVideoModal(); } });
+}
+
+/* ---- 65-edit.js ---- */
+/* ====================== IN-APP EDITING (v3): corners, walls, relabel, add/remove, hover tags, tips ====================== */
+const SIDE_NAMES = { top: 'top wall', right: 'right wall', bottom: 'bottom wall', left: 'left wall' };
+const FIX_NAMES = { door: 'Door', angledDoor: 'Angled door', slider: 'Sliding door', opening: 'Opening', angledOpening: 'Angled opening', window: 'Window', angledWindow: 'Angled window', builtin: 'Built-in', tvmount: 'TV mount', art: 'Wall art', fireplace: 'Fireplace' };
+const STRAIGHT_OF = { angledDoor: 'door', angledOpening: 'opening', angledWindow: 'window' };
+UI.tags = true;
+// ---- wall (edge) helpers. Edge i runs from roomPoly(r)[i] to [i+1]. Its label lives in r.wallLabels[edgeKey] ----
+function edgeKey(r, i) {
+  const P = roomPoly(r), p = P[i], q = P[(i + 1) % P.length], e = .01; if (!p || !q) return 'e' + i;
+  if (Math.abs(p[1] - q[1]) < e) { if (Math.abs(p[1] - r.y) < e) return 'top'; if (Math.abs(p[1] - (r.y + r.d)) < e) return 'bottom'; }
+  if (Math.abs(p[0] - q[0]) < e) { if (Math.abs(p[0] - r.x) < e) return 'left'; if (Math.abs(p[0] - (r.x + r.w)) < e) return 'right'; }
+  return 'e' + i;
+}
+function edgeSeg(r, i) { const P = roomPoly(r); return [P[i], P[(i + 1) % P.length]]; }
+function wallSideName(r, i) { const k = edgeKey(r, i); if (SIDE_NAMES[k]) return SIDE_NAMES[k]; const [p, q] = edgeSeg(r, i); return (Math.abs(p[0] - q[0]) > .01 && Math.abs(p[1] - q[1]) > .01) ? 'slanted wall' : 'wall ' + (i + 1); }
+function wallText(r, i) { const l = (r.wallLabels || {})[edgeKey(r, i)]; return l || wallSideName(r, i); }
+function fixName(f) { return FIX_NAMES[f.type] || f.type; }
+// ---- outline geometry ----
+function absPts(r) { return roomPoly(r).map(p => [p[0], p[1]]); }
+function segX(a, b, c, d) { const o = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])); return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0; }
+function validOutline(P) {
+  const n = P.length; if (n < 3) return false;
+  for (let i = 0; i < n; i++) if (V.len(V.sub(P[i], P[(i + 1) % n])) < 3) return false;
+  if (polyArea(P) < 144 * 4) return false;
+  for (let i = 0; i < n; i++) for (let j = i + 2; j < n; j++) { if (i === 0 && j === n - 1) continue; if (segX(P[i], P[(i + 1) % n], P[j], P[(j + 1) % n])) return false; }
+  return true;
+}
+function isPlainRect(r) {
+  if (!hasPts(r) || r.pts.length !== 4 || r.fixtures.some(f => f.corner && isCutFix(f))) return false;
+  const k = new Set(r.pts.map(q => (Math.abs(q[0]) < .01 ? 'L' : Math.abs(q[0] - r.w) < .01 ? 'R' : 'x') + (Math.abs(q[1]) < .01 ? 'T' : Math.abs(q[1] - r.d) < .01 ? 'B' : 'y')));
+  return ['LT', 'RT', 'RB', 'LB'].every(c => k.has(c));
+}
+function dropEdgeLabels(r) { if (r.wallLabels) for (const k of Object.keys(r.wallLabels)) if (/^e\d+$/.test(k)) delete r.wallLabels[k]; }
+function toRect(r) { delete r.pts; r.shape = 'rect'; r.notch = null; dropEdgeLabels(r); }
+// absolute outline -> bbox + relative pts; wall fixtures keep their position on the plan
+function setRoomOutline(r, P) {
+  const xs = P.map(p => p[0]), ys = P.map(p => p[1]), x0 = Math.min(...xs), y0 = Math.min(...ys), x1 = Math.max(...xs), y1 = Math.max(...ys);
+  const dx = x0 - r.x, dy = y0 - r.y;
+  r.fixtures.forEach(f => { if (f.corner) return; if (f.wall === 'top' || f.wall === 'bottom') f.pos = rnd1(f.pos - dx); else f.pos = rnd1(f.pos - dy); });
+  r.x = rnd1(x0); r.y = rnd1(y0); r.w = rnd1(x1 - x0); r.d = rnd1(y1 - y0);
+  r.pts = P.map(p => [rnd1(p[0] - r.x), rnd1(p[1] - r.y)]); r.shape = 'poly'; r.notch = null;
+  clampFixtures(r);
+}
+function alignPt(np, nbrs, T) { // 'straighten': snap to line up with neighbouring corners
+  const out = np.slice(), guides = [];
+  for (const ax of [0, 1]) { let best = null; for (const q of nbrs) { const dd = Math.abs(q[ax] - np[ax]); if (dd <= T && (!best || dd < best.d)) best = { d: dd, v: q[ax], q }; } if (best) { out[ax] = best.v; guides.push(best.q); } }
+  return { p: out, guides: guides.map(q => [q, out]) };
+}
+function tryOutline(r, r0, P) { // validate + apply (from snapshot r0); returns true when applied
+  if (!validOutline(P)) return false;
+  const cand = clone(r0); setRoomOutline(cand, P);
+  if (overlapsAny(cand, r.id)) return false;
+  for (const k of Object.keys(r)) if (!(k in cand)) delete r[k];
+  Object.assign(r, cand); return true;
+}
+function vertexDrag(d, w) {
+  const r = roomById(d.id); if (!r) return;
+  if (!d.P0) { d.P0 = absPts(r); d.i = +d.h.slice(2); d.r0 = clone(r); }
+  const P = d.P0.map(p => p.slice()), i = d.i, n = P.length; if (i >= n) return;
+  let np = UI.snap ? [snapTo(w[0], UI.grid), snapTo(w[1], UI.grid)] : [Math.round(w[0]), Math.round(w[1])];
+  const a = alignPt(np, [P[(i - 1 + n) % n], P[(i + 1) % n]], Math.max(CONFIG.snapRoomEdge, 10 / UI.view.z));
+  P[i] = a.p; UI._guides = a.guides;
+  if (!tryOutline(r, d.r0, P) && !d.warned) { d.warned = true; toast('Can’t put the corner there (walls would cross or overlap another room)'); }
+}
+function wallDrag(d, w) {
+  const r = roomById(d.id); if (!r) return;
+  if (!d.P0) { d.P0 = absPts(r); d.r0 = clone(r); }
+  const P = d.P0.map(p => p.slice()), n = P.length, e = d.e, p = P[e], q = P[(e + 1) % n]; if (!p || !q) return;
+  const u = V.norm(V.sub(q, p)), nn = [-u[1], u[0]]; let t = V.dot(V.sub(w, d.w0), nn); t = UI.snap ? snapTo(t, UI.grid) : Math.round(t);
+  P[e] = V.add(p, V.mul(nn, t)); P[(e + 1) % n] = V.add(q, V.mul(nn, t));
+  tryOutline(r, d.r0, P);
+}
+function finishShapeDrag(d) {
+  UI._guides = null; const r = roomById(d.id); if (!r) return;
+  const s = UI.sel, pos = s.kind === 'corner' ? roomPoly(r)[s.v] : null;
+  if (isPlainRect(r)) { toRect(r); if (pos) { const P = roomPoly(r); let bi = 0; P.forEach((p, i) => { if (V.len(V.sub(p, pos)) < V.len(V.sub(P[bi], pos))) bi = i; }); UI.sel = { kind: 'corner', id: r.id, v: bi }; } if (s.kind === 'wall') UI.sel = { kind: 'room', id: r.id }; }
+}
+function moveWallBy(r, e, vec) { // used by commands: shift one wall (both endpoints) by vec, keeping the rest of the room
+  const P = absPts(r), n = P.length, p = P[e], q = P[(e + 1) % n], u = V.norm(V.sub(q, p)), nn = [-u[1], u[0]], t = V.dot(vec, nn);
+  if (Math.abs(t) < .01) return false;
+  P[e] = V.add(p, V.mul(nn, t)); P[(e + 1) % n] = V.add(q, V.mul(nn, t));
+  const r0 = clone(r); if (!tryOutline(r, r0, P)) return false; if (isPlainRect(r)) toRect(r); return true;
+}
+function moveCornerBy(r, v, vec) { const P = absPts(r); P[v] = V.add(P[v], vec); const r0 = clone(r); if (!tryOutline(r, r0, P)) return false; if (isPlainRect(r)) toRect(r); return true; }
+// ---- add / remove corner, straighten ----
+function shiftEdgeLabels(r, idx, delta) { const W = r.wallLabels || {}, out = {}; for (const k of Object.keys(W)) { const m = /^e(\d+)$/.exec(k); if (!m) { out[k] = W[k]; continue; } const i = +m[1]; if (delta < 0 && i === idx) continue; out[i > idx ? 'e' + (i + delta) : k] = W[k]; } r.wallLabels = out; }
+function insertCorner() {
+  if (UI.sel.kind !== 'wall') { toast('Tap a wall first, then Add corner'); return false; }
+  const r = roomById(UI.sel.id); if (!r) return false; const e = UI.sel.e, P = absPts(r), n = P.length, p = P[e], q = P[(e + 1) % n];
+  let m = V.mul(V.add(p, q), .5); m = [rnd1(m[0]), rnd1(m[1])];
+  P.splice(e + 1, 0, m); shiftEdgeLabels(r, e, 1);
+  setRoomOutline(r, P); UI.sel = { kind: 'corner', id: r.id, v: e + 1 }; commit();
+  toast('Corner added – drag the orange dot to bend the wall'); return true;
+}
+function removeCorner() {
+  if (UI.sel.kind !== 'corner') { toast('Tap a corner (round dot) first, then Remove corner'); return false; }
+  const r = roomById(UI.sel.id); if (!r) return false; const v = UI.sel.v, P = absPts(r);
+  if (P.length <= 3) { toast('A room needs at least 3 corners – use Straighten walls to make it a rectangle'); return false; }
+  P.splice(v, 1);
+  const r0 = clone(r); shiftEdgeLabels(r0, v, -1);
+  if (!tryOutline(r, r0, P)) { toast('Can’t remove that corner (walls would cross or overlap another room)'); return false; }
+  if (isPlainRect(r)) toRect(r);
+  UI.sel = { kind: 'room', id: r.id }; commit(); toast('Corner removed'); return true;
+}
+function straightenFixture(r, f) {
+  const nt = STRAIGHT_OF[f.type]; if (!nt || !f.corner) return false;
+  const c = f.corner, len = f.len || 36, walls = [c[0] === 't' ? 'top' : 'bottom', c[1] === 'l' ? 'left' : 'right'];
+  f.type = nt; delete f.corner; delete f.a; delete f.b; f.len = len;
+  let placed = false;
+  for (const wl of walls) {
+    const [lo, hi] = wallRange(r, wl), atStart = wl === walls[0] ? c[1] === 'l' : c[0] === 't', pos = atStart ? lo : Math.max(lo, hi - len);
+    if (!r.fixtures.some(o => o !== f && !o.corner && o.wall === wl && pos < o.pos + o.len && o.pos < pos + len)) { f.wall = wl; f.pos = pos; placed = true; break; }
+  }
+  if (!placed) { const [lo] = wallRange(r, walls[0]); f.wall = walls[0]; f.pos = c[1] === 'l' ? lo : Math.max(lo, r.w - len); }
+  clampFixtures(r); return true;
+}
+function straightenRoom(r, opts = {}) {
+  if (!r) return { changed: false, msg: 'Select a room first' };
+  const notes = [];
+  if (hasPts(r)) { toRect(r); notes.push('walls squared to ' + fmtIn(r.w) + ' × ' + fmtIn(r.d)); }
+  const cuts = r.fixtures.filter(f => f.corner && isCutFix(f));
+  for (const f of cuts) if (straightenFixture(r, f)) notes.push('“' + (f.label || fixName(f)) + '” moved onto the ' + f.wall + ' wall');
+  if (!notes.length) return { changed: false, msg: r.name + ' already has straight walls' };
+  const ov = S.rooms.find(o => o.id !== r.id && roomsOverlap(r, o));
+  const msg = 'Straightened ' + r.name + ': ' + notes.join('; ') + (ov ? ' – note: it now overlaps ' + ov.name + ', drag it clear' : '');
+  if (!opts.noCommit) { commit(); toast(msg, 4000); }
+  return { changed: true, msg };
+}
+// ---- inline relabel ----
+function edApply(key, val) {
+  val = String(val == null ? '' : val);
+  if (key === 'rname' || key === 'rtype') { const r = selRoom(); if (!r) return; if (key === 'rname') { const v = val.trim(); if (!v || v === r.name) { refreshAll(); return; } r.name = v; } else r.type = val; commit(); return; }
+  if (key === 'wlabel') { const s = UI.sel; const r = roomById(s.id); if (!r || s.kind !== 'wall') return; r.wallLabels = r.wallLabels || {}; const k = edgeKey(r, s.e), v = val.trim(); if (v) r.wallLabels[k] = v; else delete r.wallLabels[k]; commit(); return; }
+  if (key === 'flabel') { const h = findFixture(UI.sel.id); if (!h) return; h.f.label = val.trim(); commit(); }
+}
+function bindInline(root) {
+  root.addEventListener('keydown', e => {
+    const t = e.target; if (!(t.matches && t.matches('input[type=text]'))) return;
+    if (e.key === 'Enter') { e.preventDefault(); t.blur(); }
+    else if (e.key === 'Escape') { e.preventDefault(); t.value = t.defaultValue; t._cancel = true; t.blur(); t._cancel = false; }
+  });
+  root.addEventListener('change', e => { const t = e.target, k = t.dataset && t.dataset.ed; if (!k) return; if (t._cancel) { t._cancel = false; return; } e.stopPropagation(); edApply(k, t.value); }, true);
+}
+const typeOpts = r => ROOM_TYPES.map(t => `<option ${r.type === t ? 'selected' : ''} value="${t}">${t}</option>`).join('');
+function edBtns(kind) {
+  const b = (a, l, cls = '', title = '') => `<button data-eb="${a}" class="${cls}" title="${esc(title)}">${l}</button>`;
+  if (kind === 'room') return b('straighten', '⬚ Straighten walls', '', 'Square this room up to a rectangle (also straightens angled corner doors/openings)') + b('addroom', '＋ Add room', '', 'Add a new room next to this one') + b('delroom', '🗑 Delete room', 'danger');
+  if (kind === 'wall') return b('addcorner', '＋ Add corner', '', 'Split this wall with a new corner you can drag to bend it') + b('straighten', '⬚ Straighten walls') + b('selroom', 'Room ↑', '', 'Select the whole room');
+  if (kind === 'corner') return b('delcorner', '− Remove corner', '', 'Delete this corner (min 3)') + b('straighten', '⬚ Straighten walls') + b('selroom', 'Room ↑');
+  if (kind === 'fixture') return b('fstraight', '⬚ Make straight', '', 'Move this angled item onto a straight wall') + b('delfix', '🗑 Delete', 'danger');
+  return b('addroom', '＋ Add room');
+}
+function edbarHTML() {
+  const s = UI.sel, k = s.kind;
+  if (k === 'room' || k === 'wall' || k === 'corner') {
+    const r = roomById(s.id); if (!r) return '';
+    if (k === 'room') return `<span class="ebk">Room</span><input type="text" data-ed="rname" value="${esc(r.name)}" aria-label="Room name" title="Room name – Enter saves, Esc cancels"><select data-ed="rtype" aria-label="Room type" title="Room type (colours and checks follow)">${typeOpts(r)}</select>${edBtns('room')}<span class="small">${fmtIn(r.w)} × ${fmtIn(r.d)} · ${Math.round(roomSqft(r) * 10) / 10} sq ft${hasPts(r) ? ' · reshaped (' + r.pts.length + ' corners)' : ''}</span>`;
+    if (k === 'wall') { const [p, q] = edgeSeg(r, s.e); if (!p) return ''; return `<span class="ebk wall">Wall</span><input type="text" data-ed="wlabel" value="${esc((r.wallLabels || {})[edgeKey(r, s.e)] || '')}" placeholder="${esc(wallSideName(r, s.e))} – type a label" aria-label="Wall label" title="Wall label – Enter saves, Esc cancels">${edBtns('wall')}<span class="small">${esc(wallSideName(r, s.e))} of ${esc(r.name)} · ${fmtIn(V.len(V.sub(q, p)))} · drag it to move</span>`; }
+    return `<span class="ebk wall">Corner</span><span class="small" style="display:inline">${s.v + 1} of ${roomPoly(r).length} · ${esc(r.name)}</span>${edBtns('corner')}<span class="small">Drag the orange dot – it snaps straight in line with the neighbouring corners.</span>`;
+  }
+  if (k === 'fixture') { const h = findFixture(s.id); if (!h) return ''; const f = h.f; return `<span class="ebk fix">${esc(fixName(f))}</span><input type="text" data-ed="flabel" value="${esc(f.label || '')}" aria-label="Label" title="Label – Enter saves, Esc cancels">${STRAIGHT_OF[f.type] ? edBtns('fixture') : edBtns('fixture').replace(/<button data-eb="fstraight"[^]*?<\/button>/, '')}<span class="small">in ${esc(h.r.name)} · drag along a wall, blue dots resize</span>`; }
+  return `<span class="small" style="display:inline">Tap a room, wall, door or window to select it.</span>${edBtns(null)}`;
+}
+function renderEdbar(light) {
+  const el = $('#edbar'); if (!el) return; const on = UI.mode === 'edit'; el.classList.toggle('show', on);
+  if (!on) { if (el.innerHTML) el.innerHTML = ''; return; }
+  const fo = document.activeElement && el.contains(document.activeElement);
+  if (fo && (light || /INPUT/.test(document.activeElement.tagName))) return;
+  el.innerHTML = edbarHTML();
+}
+roomSelHTML = function () {
+  const r = roomById(UI.sel.id); if (!r) return '';
+  return `<div class="row"><label>Name</label><input type="text" data-ed="rname" value="${esc(r.name)}"></div><div class="row"><label>Type</label><select data-ed="rtype">${typeOpts(r)}</select></div>
+  <div><b>${esc(r.name)}</b> · ${fmtIn(r.w)}×${fmtIn(r.d)} · ${Math.round(roomSqft(r) * 10) / 10} sq ft${hasPts(r) ? ` · reshaped outline (${r.pts.length} corners)` : ''}</div>
+  ${UI.mode === 'edit' ? `<div class="row">${edBtns('room')}</div>` : ''}
+  <div class="small">Edit Room mode: drag the room to move it; yellow squares resize; <b>orange dots are corners</b> – drag one to reshape (it snaps in line with its neighbours, so a slanted wall straightens in one drag). Tap a wall to label it or add a corner.${hasPts(r) ? ' Doors and windows on a reshaped room follow the wall facing their side (top/right/bottom/left); their position is measured along the room’s outer box.' : ''} Rotate, mirror, duplicate and open plan are in the Rooms panel below.</div>`;
+};
+function edSelHTML() {
+  const s = UI.sel, r = roomById(s.id); if (!r) return 'Nothing selected.';
+  if (s.kind === 'wall') { const [p, q] = edgeSeg(r, s.e); return `<div class="row"><label>Wall label</label><input type="text" data-ed="wlabel" value="${esc((r.wallLabels || {})[edgeKey(r, s.e)] || '')}" placeholder="${esc(wallSideName(r, s.e))}"></div><div class="small">${esc(wallSideName(r, s.e))} of <b>${esc(r.name)}</b> · ${fmtIn(V.len(V.sub(q, p)))} long. Drag the selected wall to move it; Add corner splits it so you can bend it.</div><div class="row">${edBtns('wall')}</div>`; }
+  return `<div><b>Corner ${s.v + 1}</b> of ${esc(r.name)}</div><div class="small">Drag the orange dot to move just this corner. With Snap on it snaps to the grid and lines up with the neighbouring corners.</div><div class="row">${edBtns('corner')}</div>`;
+}
+function edAction(a, btn) {
+  const s = UI.sel, r = (s.kind === 'room' || s.kind === 'wall' || s.kind === 'corner') ? roomById(s.id) : null;
+  if (a === 'straighten') { const rr = r || (s.kind === 'fixture' && findFixture(s.id) || {}).r; const res = straightenRoom(rr); if (!res.changed) toast(res.msg); if (rr) { UI.sel = { kind: 'room', id: rr.id }; refreshAll(); } return true; }
+  if (a === 'addroom') { showMenu(btn, ROOM_PRESETS.map(p => ({ label: p.label + (p.w ? ' (' + fmtIn(p.w) + '×' + fmtIn(p.d) + ')' : ''), fn: () => addRoom(p.key) }))); return true; }
+  if (a === 'delroom') { if (r) deleteRoomConfirm(r.id); return true; }
+  if (a === 'addcorner') { insertCorner(); return true; }
+  if (a === 'delcorner') { removeCorner(); return true; }
+  if (a === 'selroom') { if (r) { UI.sel = { kind: 'room', id: r.id }; refreshAll(); } return true; }
+  if (a === 'fstraight') { const h = findFixture(s.id); if (h && straightenFixture(h.r, h.f)) { commit(); toast('“' + (h.f.label || fixName(h.f)) + '” is now on the ' + h.f.wall + ' wall'); } return true; }
+  if (a === 'delfix') { if (s.kind === 'fixture') { const h = findFixture(s.id); deleteSelected(); if (h) undoToast('Deleted “' + (h.f.label || fixName(h.f)) + '”'); } return true; }
+  return false;
+}
+function undoToast(msg) {
+  const t = $('#toast'); t.innerHTML = esc(msg) + '<button id="toastUndo">↶ Undo</button>'; t.classList.add('show', 'act');
+  $('#toastUndo').onclick = () => { undo(); t.classList.remove('show', 'act'); toast('Undone'); };
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show', 'act'), 6000);
+}
+function tapRoomLabel(id) {
+  const r = roomById(id); if (!r) return;
+  UI.sel = { kind: 'room', id }; UI.curRoom = id; if (UI.mode !== 'edit') setMode('edit'); else refreshAll();
+  const inp = $('#edbar [data-ed=rname]'); if (inp) { inp.focus(); inp.select(); }
+}
+// ---- overlays: wall hit lines, selected wall, alignment guides ----
+RENDER_HOOKS.under.push(() => {
+  if (UI.mode !== 'edit') return ''; let o = ''; const sw = rnd1(Math.max(8, 16 / UI.view.z));
+  for (const r of S.rooms) { const P = roomPoly(r); P.forEach((p, i) => { const q = P[(i + 1) % P.length], on = UI.sel.kind === 'wall' && UI.sel.id === r.id && UI.sel.e === i; o += `<line class="wl${on ? ' on' : ''}" data-kind="wall" data-id="${r.id}" data-e="${i}" x1="${rnd1(p[0])}" y1="${rnd1(p[1])}" x2="${rnd1(q[0])}" y2="${rnd1(q[1])}" stroke="transparent" stroke-width="${sw}" pointer-events="stroke"/>`; }); }
+  return o;
+});
+RENDER_HOOKS.over.push(() => {
+  if (UI.mode !== 'edit') return ''; let o = '';
+  if (UI.sel.kind === 'wall') { const r = roomById(UI.sel.id); if (r) { const [p, q] = edgeSeg(r, UI.sel.e); if (p) o += `<line x1="${rnd1(p[0])}" y1="${rnd1(p[1])}" x2="${rnd1(q[0])}" y2="${rnd1(q[1])}" stroke="#ff8a3d" stroke-width="${rnd1(CONFIG.wall + 1.5)}" stroke-opacity=".8" stroke-linecap="round" pointer-events="none" class="wsel"/>`; } }
+  if (UI._guides) for (const [a, b] of UI._guides) o += `<line x1="${rnd1(a[0])}" y1="${rnd1(a[1])}" x2="${rnd1(b[0])}" y2="${rnd1(b[1])}" stroke="#ff8a3d" stroke-width="${rnd1(1 / UI.view.z + .2)}" stroke-dasharray="4 3" pointer-events="none"/>`;
+  return o;
+});
+// ---- hover / selection tags ("Wall: Front door wall", "Door", "Window", room name) ----
+UI.hover = null;
+function hoverInfo(el) { const t = el && el.closest ? el.closest('[data-kind]') : null; if (!t || !t.closest('#world')) return null; const k = t.dataset.kind; if (!['fixture', 'wall', 'handle', 'room', 'rlabel'].includes(k)) return null; return { kind: k, id: t.dataset.id, e: t.dataset.e, h: t.dataset.h }; }
+function setHover(el, touch) { const h = hoverInfo(el), key = h ? JSON.stringify(h) : ''; if (key === UI._hovKey && !touch) return; UI._hovKey = key; UI.hover = h; applyHover(); }
+function tagText(h) {
+  if (h.kind === 'fixture') { const x = findFixture(h.id); if (!x) return ''; const nm = fixName(x.f); return x.f.label && x.f.label.toLowerCase().indexOf(nm.toLowerCase()) !== 0 ? nm + ': ' + x.f.label : (x.f.label || nm); }
+  const r = roomById(h.id); if (!r) return '';
+  if (h.kind === 'wall') return 'Wall: ' + wallText(r, +h.e);
+  if (h.kind === 'handle') return String(h.h).startsWith('v-') ? 'Corner – drag to reshape' : 'Resize ' + r.name;
+  if (h.kind === 'corner') return 'Corner ' + (h.v + 1) + ' of ' + r.name;
+  return 'Room: ' + r.name + ' (' + r.type + ')' + (h.kind === 'rlabel' ? ' – tap to rename' : '');
+}
+function hoverEl(h) {
+  if (h.kind === 'wall') return world.querySelector(`.wl[data-id="${h.id}"][data-e="${h.e}"]`);
+  if (h.kind === 'handle') return world.querySelector(`.hd[data-id="${h.id}"][data-h="${h.h}"]`);
+  if (h.kind === 'corner') return world.querySelector(`.hd[data-id="${h.id}"][data-h="v-${h.v}"]`);
+  if (h.kind === 'rlabel') return world.querySelector(`.rlab[data-id="${h.id}"]`);
+  return world.querySelector(`[data-kind="${h.kind}"][data-id="${h.id}"]`);
+}
+function applyHover() {
+  if (!world) return;
+  world.querySelectorAll('.hov').forEach(e => e.classList.remove('hov')); const old = world.querySelector('#tagLayer'); if (old) old.remove();
+  if (UI.mode !== 'edit') return;
+  const list = [], fs = fsz();
+  if (UI.hover) list.push(Object.assign({ hov: true }, UI.hover));
+  const s = UI.sel;
+  const hv = UI.hover;
+  if (s.kind === 'fixture' || s.kind === 'wall' || s.kind === 'corner') { const same = hv && hv.id === s.id && ((hv.kind === s.kind && String(hv.e) === String(s.e)) || (s.kind === 'corner' && hv.kind === 'handle' && hv.h === 'v-' + s.v)); if (!same) list.push({ kind: s.kind, id: s.id, e: s.e, v: s.v }); }
+  let o = '';
+  for (const h of list) {
+    const el = hoverEl(h); if (!el) continue;
+    if (h.hov && h.kind !== 'room') el.classList.add('hov');
+    if (!UI.tags || h.kind === 'room') continue; // rooms always carry their name label
+    let bb; try { bb = el.getBBox(); } catch (e) { continue; }
+    const txt = tagText(h); if (!txt) continue;
+    const x = bb.x + bb.width / 2, above = (bb.y - fs * 2.2 - UI.view.y) * UI.view.z > 64, y = above ? bb.y - fs * .7 : bb.y + bb.height + fs * 1.5, w = txt.length * fs * .56 + fs, hh = fs * 1.35;
+    o += `<g class="tag" data-tag="${esc(h.kind)}"><rect x="${rnd1(x - w / 2)}" y="${rnd1(y - hh * .8)}" width="${rnd1(w)}" height="${rnd1(hh)}" rx="${rnd1(fs * .3)}" fill="#0b1220" fill-opacity=".9" stroke="${h.kind === 'fixture' ? '#6ea8fe' : h.kind === 'room' || h.kind === 'rlabel' ? '#ffd479' : '#ff8a3d'}" stroke-width="${rnd1(.8 / UI.view.z + .15)}"/><text x="${rnd1(x)}" y="${rnd1(y)}" font-size="${rnd1(fs)}" text-anchor="middle" fill="#fff">${esc(txt)}</text></g>`;
+  }
+  if (o) world.insertAdjacentHTML('beforeend', `<g id="tagLayer" pointer-events="none">${o}</g>`);
+}
+{ const _r = render; render = function () { _r(); applyHover(); }; }
+svg.addEventListener('pointerleave', () => { if (!drag) { UI.hover = null; UI._hovKey = ''; applyHover(); } });
+// ---- tips bar ----
+const HELP_KEY = 'roomPlanner.helpHidden';
+function helpText() {
+  if (innerWidth <= 600) return UI.mode === 'edit' ? '<b>Edit Room:</b> tap to select · drag to move · orange dots reshape corners · tap a name to relabel · ↶ undo' : UI.mode === 'sketch' ? '<b>Sketch:</b> drag to draw a room · ↖ Select to move/resize' : '<b>Tips:</b> tap to select · drag to move · tap a room name to relabel · Edit Room fixes walls';
+  if (UI.mode === 'edit') return '<b>Edit Room:</b> tap a room, wall, door or window to select it · drag to move · orange dots = corners (drag to reshape) · tap a name to relabel · <b>Straighten walls</b> squares a room up · ↶ undoes anything.';
+  if (UI.mode === 'sketch') return '<b>Sketch:</b> drag to draw a room or click corners to draw walls · ↖ Select to move/resize · switch to <b>Edit Room</b> to fine-tune walls and names.';
+  return '<b>Tips:</b> tap a piece to select it · drag to move · double-tap to rotate · tap a room name to relabel it · use <b>Edit Room</b> to fix walls, doors and windows · 💬 Command takes plain-word edits.';
+}
+function helpHidden() { try { return localStorage.getItem(HELP_KEY) === '1'; } catch (e) { return false; } }
+function renderHelp() { const hb = $('#helpbar'); if (!hb) return; hb.classList.toggle('show', !helpHidden()); const t = $('#helpText'); const h = helpText(); if (t && t.innerHTML !== h) t.innerHTML = h; }
+function setHelp(show) { try { if (show) localStorage.removeItem(HELP_KEY); else localStorage.setItem(HELP_KEY, '1'); } catch (e) { } renderHelp(); render(); }
+// ---- wiring ----
+panelHooks.push(() => { renderEdbar(); renderHelp(); $('#btnTags') && $('#btnTags').classList.toggle('on', !!UI.tags); });
+function bindEdit() {
+  bindInline($('#edbar')); bindInline($('#selBody'));
+  $('#edbar').addEventListener('click', e => { const b = e.target.closest('[data-eb]'); if (b) edAction(b.dataset.eb, b); });
+  $('#selBody').addEventListener('click', e => { const b = e.target.closest('[data-eb]'); if (b) edAction(b.dataset.eb, b); });
+  $('#helpX').onclick = () => setHelp(false); $('#btnHelp').onclick = () => setHelp(true);
+  try { const v = localStorage.getItem('roomPlanner.tags'); if (v != null) UI.tags = v !== '0'; } catch (e) { }
+  $('#btnTags').onclick = () => { UI.tags = !UI.tags; try { localStorage.setItem('roomPlanner.tags', UI.tags ? '1' : '0'); } catch (e) { } $('#btnTags').classList.toggle('on', UI.tags); applyHover(); toast(UI.tags ? 'Labels on: hover or select a wall, door or window to see what it is' : 'Hover labels off'); };
+  renderHelp(); renderEdbar();
+}
+
+/* ---- 67-cmd.js ---- */
+/* ====================== COMMAND BOX: plain-word edits (offline keyword / pattern matching, no AI or network) ====================== */
+const CMD_EX = ['rename the hallway to first bedroom', 'straighten the living room', 'make the door wider', 'move the window 12 inches right', 'move the left wall 6 inches right', 'add a bedroom', 'delete the neon sign', 'undo'];
+const CMD_TYPES = [['living room', 'living'], ['family room', 'living'], ['living', 'living'], ['lounge', 'living'], ['bedroom', 'bedroom'], ['bed room', 'bedroom'], ['kitchen', 'kitchen'], ['bathroom', 'bathroom'], ['bath', 'bathroom'], ['restroom', 'bathroom'], ['dining room', 'dining'], ['dining', 'dining'], ['closet', 'closet'], ['office', 'office'], ['study', 'office'], ['hallway', 'hallway'], ['hall', 'hallway'], ['corridor', 'hallway'], ['plain room', 'room'], ['room', 'room']];
+const CMD_STOP = new Set(['the', 'a', 'an', 'my', 'our', 'of', 'in', 'on', 'to', 'and', 'with', 'room', 'wall']);
+const CMD_DIRS = { left: [-1, 0], west: [-1, 0], right: [1, 0], east: [1, 0], up: [0, -1], north: [0, -1], top: [0, -1], down: [0, 1], south: [0, 1], bottom: [0, 1] };
+const CMD_SIDE = { left: 'left', west: 'left', right: 'right', east: 'right', top: 'top', up: 'top', north: 'top', upper: 'top', bottom: 'bottom', down: 'bottom', south: 'bottom', lower: 'bottom' };
+const CMD_FIX = [['sliding door', 'slider'], ['slider', 'slider'], ['angled door', 'angledDoor'], ['angled window', 'angledWindow'], ['angled opening', 'angledOpening'], ['window with blinds', 'windowB'], ['window with curtain', 'windowC'], ['door', 'door'], ['window', 'window'], ['doorway', 'opening'], ['opening', 'opening'], ['built-in', 'builtin'], ['built in', 'builtin'], ['builtin', 'builtin'], ['cabinet', 'builtin'], ['tv mount', 'tvmount'], ['painting', 'art'], ['picture', 'art'], ['art', 'art'], ['fireplace', 'fireplace']];
+const CMD_FIXKW = [['sliding door', ['slider']], ['front door', ['door', 'angledDoor', 'slider'], 'entry'], ['entrance', ['door', 'angledDoor', 'slider'], 'entry'], ['door', ['door', 'angledDoor', 'slider']], ['window', ['window', 'angledWindow']], ['opening', ['opening', 'angledOpening']], ['doorway', ['opening', 'angledOpening']], ['built-in', ['builtin']], ['built in', ['builtin']], ['builtins', ['builtin']], ['cabinet', ['builtin']], ['fireplace', ['fireplace']], ['tv mount', ['tvmount']], ['mount', ['tvmount']], ['art', ['art']], ['painting', ['art']], ['poster', ['art']], ['picture', ['art']]];
+const CMD_ROOMS = [['l-shaped', 'L'], ['l shaped', 'L'], ['hallway', 'hallway'], ['corridor', 'hallway'], ['hall', 'hallway'], ['bedroom', 'bedroom'], ['kitchen', 'kitchen'], ['bathroom', 'bathroom'], ['bath', 'bathroom'], ['dining', 'dining'], ['closet', 'closet'], ['office', 'office'], ['study', 'office'], ['room', 'room']];
+const LEN = String.raw`(\d+(?:\.\d+)?(?:\s*(?:ft|feet|foot|'|in|inch|inches|"|″))?(?:\s*\d+(?:\.\d+)?\s*(?:in|inch|inches|"|″))?)`;
+const cmdClean = s => String(s || '').toLowerCase().replace(/[“”"’]/g, '').replace(/\s+/g, ' ').trim().replace(/^(?:the|a|an|my|our)\s+/, '').trim();
+function cmdLen(s) { s = String(s).toLowerCase(); let m = /(\d+(?:\.\d+)?)\s*(?:ft|feet|foot|')\s*(?:(\d+(?:\.\d+)?)\s*(?:in|inch|inches|"|″)?)?/.exec(s); if (m) return parseFloat(m[1]) * 12 + (m[2] ? parseFloat(m[2]) : 0); m = /(\d+(?:\.\d+)?)/.exec(s); return m ? parseFloat(m[1]) : null; }
+function cmdType(s) { s = cmdClean(s); for (const [k, t] of CMD_TYPES) if (s === k) return t; return null; }
+function cmdTypeIn(s) { s = ' ' + String(s).toLowerCase() + ' '; for (const [k, t] of CMD_TYPES) if (t !== 'room' && new RegExp('[^a-z]' + k + '[^a-z]').test(s)) return t; return null; }
+function cmdNice(s) { s = String(s).trim().replace(/^["“']+|["”']+$/g, '').trim(); return s && s === s.toLowerCase() ? s[0].toUpperCase() + s.slice(1) : s; }
+const SELF_RE = /^(?:it|this|that|this one|that one|selection|selected|the selection|(?:the )?selected(?: \w+)?|(?:this|that|current|the current) (?:room|wall|door|window|opening|corner|item|one|fixture|piece|thing))$/;
+const isSelf = p => SELF_RE.test(String(p || '').toLowerCase().trim());
+// ---- reference resolution ----
+function selTarget() {
+  const s = UI.sel;
+  if (s.kind === 'room' || s.kind === 'corner') { const r = roomById(s.id); return r ? { kind: 'room', r, score: 99, self: true } : null; }
+  if (s.kind === 'wall') { const r = roomById(s.id); return r ? { kind: 'wall', r, e: s.e, score: 99, self: true } : null; }
+  if (s.kind === 'fixture') { const h = findFixture(s.id); return h ? { kind: 'fixture', r: h.r, f: h.f, score: 99, self: true } : null; }
+  if (s.kind === 'piece') { const p = getSelPiece(); return p ? { kind: 'piece', p, score: 99, self: true } : null; }
+  return null;
+}
+function scoreRoom(r, p) {
+  const nm = r.name.toLowerCase(), strip = x => x.replace(/\s+room$/, '');
+  if (nm === p) return 100; if (strip(nm) === strip(p)) return 95;
+  if (p.length >= 3 && nm.includes(p)) return 75; if (nm.length >= 3 && p.includes(nm)) return 70;
+  const t = cmdType(p); if (t && t !== 'room' && r.type === t) return 60;
+  const w1 = new Set(p.split(' ').filter(x => x.length > 2 && !CMD_STOP.has(x))), ov = nm.split(' ').filter(x => w1.has(x)).length;
+  return ov ? 30 + ov * 5 : 0;
+}
+function scoreFix(f, r, p) {
+  const lb = (f.label || '').toLowerCase(); let s = 0;
+  if (lb && lb === p) return 100;
+  if (lb && p.length >= 3 && lb.includes(p)) s = 72 + (lb.startsWith(p) ? 3 : 0);
+  for (const [k, types, flag] of CMD_FIXKW) if (p.includes(k) && types.includes(f.type)) s = Math.max(s, 55 + (flag === 'entry' && f.entry ? 20 : 0) + (flag === 'entry' && !f.entry ? -10 : 0));
+  if (s) { const m = /\b(top|bottom|left|right)\b/.exec(p); if (m && f.wall === m[1]) s += 6; if (r.name.toLowerCase().split(' ').some(w => w.length > 3 && p.includes(w))) s += 4; const sr = targetRoom(); if (sr && sr.id === r.id) s += 1; }
+  return s;
+}
+function scorePiece(pc, p) { const nm = (pc.name || '').toLowerCase(), lb = ((PIECES[pc.type] || {}).label || pc.type).toLowerCase(); if (nm === p) return 100; if (p.length >= 3 && (nm.includes(p) || lb.includes(p))) return 68; if (pc.type === p) return 66; return 0; }
+function resolveRef(phrase, want = 'any', prefer = null) {
+  const p = cmdClean(phrase);
+  if (!p || isSelf(phrase)) { const t = selTarget(); if (t) return t; if (!p && (want === 'room' || want === 'any') && S.rooms.length === 1) return { kind: 'room', r: S.rooms[0], score: 50 }; return null; }
+  const c = [];
+  if (want !== 'fixture') for (const r of S.rooms) { const s = scoreRoom(r, p); if (s) c.push({ kind: 'room', r, score: s + 0.5 }); }
+  if (want !== 'room') for (const r of S.rooms) for (const f of r.fixtures) { const s = scoreFix(f, r, p); if (s) c.push({ kind: 'fixture', r, f, score: s }); }
+  if (want === 'any' || want === 'piece') for (const pc of S.pieces) { const s = scorePiece(pc, p); if (s) c.push({ kind: 'piece', p: pc, score: s - 1 }); }
+  if (!c.length) return null;
+  if (prefer) c.forEach(x => { if (prefer(x)) x.score += 0.3; });
+  c.sort((a, b) => b.score - a.score); const best = c[0], ties = c.filter(x => Math.abs(x.score - best.score) < .01);
+  best.alts = ties.length; return best;
+}
+function refName(t) { return t.kind === 'room' ? '“' + t.r.name + '”' : t.kind === 'fixture' ? '“' + (t.f.label || fixName(t.f)) + '”' : t.kind === 'wall' ? 'the ' + wallText(t.r, t.e) + ' of ' + t.r.name : '“' + (t.p.name || t.p.type) + '”'; }
+function ambNote(t, what) { return t && t.alts > 1 ? ` (${t.alts} ${what || 'items'} matched – I picked ${refName(t)}; select one and say “this …” to be exact)` : ''; }
+function resolveWall(sidePh, roomPh) {
+  let side = cmdClean(sidePh).replace(/\s+wall$/, '');
+  if (!side || isSelf(side) || side === 'selected') { if (UI.sel.kind === 'wall') { const r = roomById(UI.sel.id); if (r) return { r, e: UI.sel.e }; } if (!side) return null; }
+  let r = roomPh ? (resolveRef(roomPh, 'room') || {}).r : null;
+  const sd = CMD_SIDE[side] || (side === 'front' ? null : null);
+  const pick = (rr, key) => { const P = roomPoly(rr); let bi = -1, bl = -1; for (let i = 0; i < P.length; i++) if (edgeKey(rr, i) === key) { const l = V.len(V.sub(P[(i + 1) % P.length], P[i])); if (l > bl) { bl = l; bi = i; } } return bi >= 0 ? { r: rr, e: bi } : null; };
+  if (sd) { r = r || targetRoom(); return r ? pick(r, sd) : null; }
+  for (const rr of (r ? [r] : S.rooms)) { const W = rr.wallLabels || {}; for (const k of Object.keys(W)) if (W[k] && W[k].toLowerCase().includes(side)) { if (/^e\d+$/.test(k)) return { r: rr, e: +k.slice(1) }; const x = pick(rr, k); if (x) return x; } }
+  return null;
+}
+// ---- edits ----
+function cmdAmend() { hist.stack[hist.idx] = snapJSON(); scheduleSave(); refreshAll(); } // fold a follow-up tweak into the edit just committed (one undo step)
+function cmdRename(targetPh, name) {
+  name = cmdNice(name); if (!name) return null;
+  let t = /\bwall\b/.test(String(targetPh).toLowerCase()) ? (w => w ? Object.assign({ kind: 'wall' }, w) : null)(resolveWall(String(targetPh).replace(/\bwall\b.*$/i, ''), (/\bwall\s+(?:of|in)\s+(.+)$/i.exec(targetPh) || [])[1])) : null;
+  t = t || resolveRef(targetPh);
+  if (!t) return { ok: false, msg: `Couldn't find “${String(targetPh).trim()}” in the plan – try e.g. “rename the living room to den”.` };
+  if (t.kind === 'room') {
+    const old = t.r.name; t.r.name = name; const ty = cmdTypeIn(name); let extra = '';
+    if (ty && ty !== t.r.type) { t.r.type = ty; extra = ` (type set to ${ty})`; }
+    UI.sel = { kind: 'room', id: t.r.id }; UI.curRoom = t.r.id; commit();
+    return { ok: true, msg: `Renamed “${old}” → “${name}”${extra}${ambNote(t, 'rooms')}` };
+  }
+  if (t.kind === 'wall') { t.r.wallLabels = t.r.wallLabels || {}; const old = wallText(t.r, t.e); t.r.wallLabels[edgeKey(t.r, t.e)] = name; UI.sel = { kind: 'wall', id: t.r.id, e: t.e }; commit(); return { ok: true, msg: `Relabeled wall “${old}” → “${name}”` }; }
+  if (t.kind === 'fixture') {
+    const old = t.f.label || fixName(t.f); t.f.label = name; UI.sel = { kind: 'fixture', id: t.f.id }; commit();
+    const noRoom = !t.self && cmdType(targetPh) && !S.rooms.some(r => scoreRoom(r, cmdClean(targetPh)) >= 60);
+    return { ok: true, msg: `Relabeled “${old}” → “${name}”${noRoom ? ` (there's no room called “${cmdClean(targetPh)}”, so I relabeled this fixture – say “add a bedroom” to add the room itself)` : ''}${ambNote(t)}` };
+  }
+  if (t.kind === 'piece') { const old = t.p.name; t.p.name = name; commit(); return { ok: true, msg: `Renamed “${old}” → “${name}”` }; }
+  return null;
+}
+function cmdSetType(targetPh, type) {
+  const t = resolveRef(targetPh, 'room'); if (!t || t.kind !== 'room') return { ok: false, msg: `Couldn't find a room called “${cmdClean(targetPh) || 'that'}” – select a room first or name it, e.g. “make the hallway a bedroom”.` };
+  if (t.r.type === type) return { ok: true, msg: `${t.r.name} is already a ${type}` };
+  const old = t.r.type; t.r.type = type; UI.sel = { kind: 'room', id: t.r.id }; commit();
+  return { ok: true, msg: `${t.r.name}: type ${old} → ${type} (name unchanged – say “rename ${t.r.name.toLowerCase()} to …” to change it)${ambNote(t, 'rooms')}` };
+}
+function cmdStraighten(ph) {
+  let t = resolveRef(ph);
+  if (!t && !cmdClean(ph)) { const r = targetRoom(); if (r) t = { kind: 'room', r }; }
+  if (!t) return { ok: false, msg: `Couldn't find “${cmdClean(ph)}” – try “straighten the living room” or select a room and say “straighten it”.` };
+  if (t.kind === 'fixture' && STRAIGHT_OF[t.f.type]) { const nm = t.f.label || fixName(t.f); straightenFixture(t.r, t.f); UI.sel = { kind: 'fixture', id: t.f.id }; commit(); return { ok: true, msg: `Straightened “${nm}” – it is now on the ${t.f.wall} wall of ${t.r.name}` }; }
+  const r = t.r; if (!r) return { ok: false, msg: 'Only rooms and angled doors/openings can be straightened' };
+  const res = straightenRoom(r, { noCommit: true }); if (!res.changed) return { ok: true, msg: res.msg };
+  UI.sel = { kind: 'room', id: r.id }; commit(); return { ok: true, msg: res.msg + ambNote(t) };
+}
+const canSlide = vec => x => x.kind !== 'fixture' || (!x.f.corner && Math.abs(V.dot(vec, fixAlong(x.r, x.f))) > .01);
+function fixAlong(r, f) { const g = wallBasis(r, f.wall, 0, 1); return g.u; }
+function cmdResizeFix(t, mode, val) {
+  if (!t) return { ok: false, msg: 'Which item? Select a door or window first, or name it, e.g. “make the front door wider”.' };
+  if (t.kind === 'room') return null;
+  if (t.kind !== 'fixture') return { ok: false, msg: 'I can resize doors, windows and other wall items – select one first.' };
+  const { r, f } = t, old = f.len; if (old == null) return { ok: false, msg: `“${f.label || fixName(f)}” has no width to change` };
+  let nl = mode === 'set' ? val : old + (mode === 'grow' ? 1 : -1) * (val || 6);
+  if (f.corner) { const g = diagBasis(r, f); nl = clamp(nl, 6, Math.max(6, g.L - 2)); f.len = rnd1(nl); }
+  else { const [lo, hi] = wallRange(r, f.wall); nl = clamp(nl, 4, hi - lo); const c = f.pos + old / 2; f.len = rnd1(nl); f.pos = rnd1(clamp(c - nl / 2, lo, hi - nl)); }
+  if (f.len === old) return { ok: true, msg: `“${f.label || fixName(f)}” is already ${fmtIn(old)} (limited by the wall)` };
+  UI.sel = { kind: 'fixture', id: f.id }; commit();
+  return { ok: true, msg: `“${f.label || fixName(f)}” width ${fmtIn(old)} → ${fmtIn(f.len)}${ambNote(t)}` };
+}
+function cmdMoveBy(t, vec, amt) {
+  if (!t) return { ok: false, msg: 'Which item? Select it first or name it, e.g. “move the window 12 inches right”.' };
+  if (t.kind === 'fixture') {
+    const { r, f } = t; if (f.corner) return { ok: false, msg: `“${f.label || fixName(f)}” sits in a corner – change its corner in the Selection panel, or say “straighten it” to put it on a wall` };
+    const u = fixAlong(r, f), a = V.dot(vec, u); if (Math.abs(a) < .01) return { ok: false, msg: `“${f.label || fixName(f)}” is on the ${f.wall} wall – try ${f.wall === 'top' || f.wall === 'bottom' ? '“left” or “right”' : '“up” or “down”'}, or “move it to the left wall”` };
+    const [lo, hi] = wallRange(r, f.wall), old = f.pos; f.pos = rnd1(clamp(f.pos + a, lo, Math.max(lo, hi - f.len)));
+    if (f.pos === old) return { ok: true, msg: `“${f.label || fixName(f)}” is already at the end of the wall` };
+    UI.sel = { kind: 'fixture', id: f.id }; commit(); return { ok: true, msg: `Moved “${f.label || fixName(f)}” ${fmtIn(Math.abs(f.pos - old))} along the ${f.wall} wall${ambNote(t)}` };
+  }
+  if (t.kind === 'room') {
+    const r = t.r, inside = q => pointInPoly([q.x, q.y], roomPoly(r)), ps = S.pieces.filter(inside), ls = S.lights.filter(inside);
+    r.x += vec[0]; r.y += vec[1]; if (overlapsAny(r)) { r.x -= vec[0]; r.y -= vec[1]; return { ok: false, msg: `Moving ${r.name} there would overlap another room` }; }
+    ps.concat(ls).forEach(q => { q.x += vec[0]; q.y += vec[1]; }); UI.sel = { kind: 'room', id: r.id }; commit(); return { ok: true, msg: `Moved ${r.name} ${fmtIn(amt)} (with its furniture)${ambNote(t, 'rooms')}` };
+  }
+  if (t.kind === 'wall') { const ok = moveWallBy(t.r, t.e, vec); if (!ok) return { ok: false, msg: 'Couldn’t move that wall that way (it runs in that direction, or walls would cross/overlap)' }; UI.sel = { kind: 'room', id: t.r.id }; commit(); return { ok: true, msg: `Moved the ${wallSideName(t.r, t.e)} of ${t.r.name} ${fmtIn(amt)}` }; }
+  if (t.kind === 'piece') { if (t.p.locked) return { ok: false, msg: 'That piece is locked 🔒' }; t.p.x += vec[0]; t.p.y += vec[1]; UI.sel = { kind: 'piece', id: t.p.id }; commit(); return { ok: true, msg: `Moved “${t.p.name}” ${fmtIn(amt)}` }; }
+  return null;
+}
+function placeOnWall(r, f, wall) {
+  const [lo, hi] = wallRange(r, wall); f.wall = wall; f.len = Math.min(f.len, hi - lo);
+  let best = clamp(f.pos, lo, hi - f.len);
+  const free = pos => !r.fixtures.some(o => o !== f && !o.corner && o.wall === wall && pos < o.pos + o.len + 2 && o.pos < pos + f.len + 2);
+  if (!free(best)) for (let d = 6; d < hi - lo; d += 6) { if (best + d + f.len <= hi && free(best + d)) { best += d; break; } if (best - d >= lo && free(best - d)) { best -= d; break; } }
+  f.pos = rnd1(best);
+}
+function cmdMoveTo(t, dir, how, roomPh) {
+  if (!t) return { ok: false, msg: 'Which item? Select it first or name it, e.g. “move the door to the left”.' };
+  const side = CMD_SIDE[dir], vec = CMD_DIRS[dir];
+  if (t.kind === 'fixture' && !t.f.corner) {
+    const { f } = t; let r = t.r; const along = V.dot(vec, fixAlong(r, f));
+    if (how === 'wall' || roomPh || Math.abs(along) < .01) {
+      const dest = roomPh ? (resolveRef(roomPh, 'room') || {}).r : r; if (!dest) return { ok: false, msg: `Couldn't find the room “${roomPh}”` };
+      if (dest !== r) { r.fixtures = r.fixtures.filter(x => x !== f); dest.fixtures.push(f); r = dest; }
+      placeOnWall(r, f, side); UI.sel = { kind: 'fixture', id: f.id }; commit(); return { ok: true, msg: `Moved “${f.label || fixName(f)}” to the ${side} wall of ${r.name}${ambNote(t)}` };
+    }
+    if (how === 'end') { const [lo, hi] = wallRange(r, f.wall), old = f.pos; f.pos = along < 0 ? lo : hi - f.len; if (f.pos === old) return { ok: true, msg: 'Already there' }; UI.sel = { kind: 'fixture', id: f.id }; commit(); return { ok: true, msg: `Slid “${f.label || fixName(f)}” to the ${dir} end of the ${f.wall} wall` }; }
+    return cmdMoveBy(t, V.mul(vec, 12), 12);
+  }
+  return cmdMoveBy(t, V.mul(vec, 12), 12);
+}
+function cmdAdd(rest) {
+  let s = rest.trim(), called = null, loc = null, m;
+  if ((m = /\s+(?:called|named)\s+(.+?)(?=\s+(?:to|on|in|into|at|next to)\s+|$)/i.exec(s))) { called = m[1]; s = s.slice(0, m.index) + s.slice(m.index + m[0].length); }
+  if ((m = /\s+(?:to|on|in|into|at)\s+(?:the\s+)?(.+)$/i.exec(s))) { loc = m[1]; s = s.slice(0, m.index); }
+  const item = cmdClean(s.replace(/^(?:a|an|another|one more|new|a new|one)\s+/i, ''));
+  if (/\bcorner\b/.test(item)) { if (loc) { const w = resolveWall(loc.replace(/\bwall\b.*$/i, ''), (/\bwall\s+(?:of|in)\s+(?:the\s+)?(.+)$/i.exec(loc) || [])[1]); if (w) UI.sel = { kind: 'wall', id: w.r.id, e: w.e }; } if (UI.sel.kind !== 'wall') return { ok: false, msg: 'Select a wall first (Edit Room → tap a wall), then say “add a corner”' }; if (UI.mode !== 'edit') setMode('edit'); return insertCorner() ? { ok: true, msg: 'Added a corner in the middle of that wall – drag the orange dot to bend it' } : null; }
+  const fx = CMD_FIX.find(([k]) => item.includes(k));
+  if (fx) {
+    let r = null, side = null;
+    if (loc) { const lm = /^(?:the\s+)?(top|bottom|left|right|north|south|east|west|upper|lower)\s+wall(?:\s+(?:of|in)\s+(?:the\s+)?(.+))?$/i.exec(loc.trim()); if (lm) { side = CMD_SIDE[lm[1].toLowerCase()]; if (lm[2]) r = (resolveRef(lm[2], 'room') || {}).r; } else { const t = resolveRef(loc, 'room'); if (!t) return { ok: false, msg: `Couldn't find the room “${loc}”` }; r = t.r; } }
+    r = r || targetRoom(); if (!r) return { ok: false, msg: 'Add a room first' };
+    UI.sel = { kind: 'room', id: r.id }; const n0 = r.fixtures.length; addFixture(fx[1]); const f = r.fixtures[r.fixtures.length - 1]; if (!f || r.fixtures.length === n0) return { ok: false, msg: 'Couldn’t add that here' };
+    if (side && !f.corner) placeOnWall(r, f, side); if (called) f.label = cmdNice(called); if (side || called) cmdAmend();
+    return { ok: true, msg: `Added ${f.label || fixName(f)} to ${r.name}${f.wall ? ' (' + f.wall + ' wall)' : ''} – drag it along the wall to place it` };
+  }
+  const rm = CMD_ROOMS.find(([k]) => item.includes(k)) || (cmdTypeIn(item) && [null, cmdTypeIn(item) === 'living' ? 'room' : cmdTypeIn(item)]);
+  if (rm) {
+    const key = ROOM_PRESETS.find(p => p.key === rm[1]) ? rm[1] : 'room', n0 = S.rooms.length; addRoom(key); if (S.rooms.length === n0) return null; const r = S.rooms[S.rooms.length - 1];
+    if (called) { r.name = cmdNice(called); const ty = cmdTypeIn(r.name); if (ty) r.type = ty; cmdAmend(); }
+    return { ok: true, msg: `Added ${r.name} (${fmtIn(r.w)} × ${fmtIn(r.d)}) – drag it into place in Edit Room` };
+  }
+  return null;
+}
+function deleteRoomNow(r) {
+  const inR = q => pointInPoly([q.x, q.y], roomPoly(r));
+  S.pieces = S.pieces.filter(p => !inR(p)); S.lights = S.lights.filter(l => !inR(l));
+  S.rooms = S.rooms.filter(x => x.id !== r.id); S.openPairs = S.openPairs.filter(k => !k.split('|').includes(r.id));
+  UI.sel = { kind: null, id: null }; UI.curRoom = S.rooms[0] ? S.rooms[0].id : null; commit();
+}
+function cmdDelete(ph) {
+  if (/^(?:the\s+|this\s+|that\s+|selected\s+)?corner$/i.test(ph.trim())) return removeCorner() ? { ok: true, msg: 'Corner removed' } : { ok: false, msg: 'Select a corner (orange dot) first' };
+  const t = resolveRef(ph); if (!t) return { ok: false, msg: `Couldn't find “${cmdClean(ph)}” to delete` };
+  if (t.kind === 'room') { if (S.rooms.length <= 1) return { ok: false, msg: 'A plan needs at least one room' }; const nm = t.r.name; deleteRoomNow(t.r); return { ok: true, msg: `Deleted room “${nm}” (say “undo” to bring it back)${ambNote(t, 'rooms')}` }; }
+  if (t.kind === 'fixture') { const nm = t.f.label || fixName(t.f); t.r.fixtures = t.r.fixtures.filter(x => x !== t.f); UI.sel = { kind: null, id: null }; commit(); return { ok: true, msg: `Deleted “${nm}” (say “undo” to bring it back)${ambNote(t)}` }; }
+  if (t.kind === 'piece') { const nm = t.p.name; S.pieces = S.pieces.filter(x => x !== t.p); UI.sel = { kind: null, id: null }; commit(); return { ok: true, msg: `Deleted “${nm}” (say “undo” to bring it back)${ambNote(t)}` }; }
+  if (t.kind === 'wall') return { ok: false, msg: 'Walls can’t be deleted on their own – select a corner and say “remove corner”, or delete the room' };
+  return null;
+}
+// ---- the parser ----
+function runCommand(text) {
+  let t = String(text || '').trim().replace(/[“”]/g, '"').replace(/\s+/g, ' ');
+  t = t.replace(/^(?:please|pls|can you|could you|would you|kindly|i want to|i'd like to|let's|lets)\s+/i, '').replace(/\s*(?:please|thanks|thank you)$/i, '').replace(/[.!?]+$/, '').trim();
+  const W = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, eighteen: 18, twenty: 20, thirty: 30, 'thirty-six': 36, 'forty-eight': 48 };
+  t = t.replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|eighteen|twenty|thirty|thirty-six|forty-eight)\s+(inch|inches|foot|feet|ft)\b/gi, (m, a, b) => W[a.toLowerCase()] + ' ' + b).replace(/\ba foot\b/gi, '1 ft').replace(/\ban inch\b/gi, '1 in');
+  const low = t.toLowerCase(); let m;
+  if (!t) return { ok: false, msg: 'Type an edit, e.g. “' + CMD_EX[0] + '”' };
+  if (/^(?:undo|undo that|undo it|undo last|go back|revert|oops)$/.test(low)) { if (hist.idx <= 0) return { ok: false, msg: 'Nothing to undo' }; undo(); return { ok: true, msg: 'Undone' }; }
+  if (/^(?:redo|redo that)$/.test(low)) { if (hist.idx >= hist.stack.length - 1) return { ok: false, msg: 'Nothing to redo' }; redo(); return { ok: true, msg: 'Redone' }; }
+  if (/^(?:remove|delete)\s+(?:the\s+|this\s+|that\s+|selected\s+)?corner$/.test(low)) return cmdDelete('corner');
+  if ((m = /^(?:add|insert)\s+(?:a\s+|another\s+)?corner(?:\s+(?:to|on|in)\s+(?:the\s+)?(.+))?$/i.exec(t))) return cmdAdd('corner' + (m[1] ? ' to ' + m[1] : ''));
+  // straighten
+  if ((m = /^(?:straighten|square(?:\s+up)?|unslant|un-slant)(?:\s+up)?(?:\s+(?:all\s+)?(?:the\s+)?walls?(?:\s+(?:of|in|for)\s+)?)?\s*(.*?)(?:'s\s+walls?|\s+walls?)?(?:\s+up)?$/i.exec(t))) return cmdStraighten(m[1] || '');
+  if ((m = /^(?:make|turn)\s+(.+?)\s+(?:straight|square|rectangular|a rectangle)$/i.exec(t))) return cmdStraighten(m[1]);
+  // explicit type
+  if ((m = /^(?:set|change|make)\s+(?:the\s+)?(?:room\s+)?type\s+(?:of\s+(.+?)\s+)?(?:to\s+)?(?:a\s+|an\s+)?(.+)$/i.exec(t)) && cmdType(m[2])) return cmdSetType(m[1] || '', cmdType(m[2]));
+  // rename
+  if ((m = /^(?:rename|relabel|re-label|re-name)\s+(.+?)\s+(?:to|as|into)\s+(.+)$/i.exec(t))) return cmdRename(m[1], m[2]);
+  if ((m = /^(?:rename|relabel)\s+(?:it|this|that)\s+(.+)$/i.exec(t))) return cmdRename('it', m[1]);
+  if ((m = /^(?:call|name|label)\s+(.+)$/i.exec(t))) {
+    const rest = m[1], tm = /^(.+?)\s+(?:to|as)\s+(.+)$/i.exec(rest); if (tm && (isSelf(tm[1]) || resolveRef(tm[1]))) return cmdRename(tm[1], tm[2]);
+    const ws = rest.split(' '); let best = null;
+    for (let k = 1; k < ws.length; k++) { const tp = ws.slice(0, k).join(' '), ref = isSelf(tp) ? { score: 99 } : resolveRef(tp); if (ref && ref.score >= 50 && (!best || ref.score > best.s || (ref.score === best.s && k > best.k))) best = { s: ref.score, k, tp }; }
+    if (best) return cmdRename(best.tp, ws.slice(best.k).join(' '));
+  }
+  // fixture / room size
+  if ((m = /^(?:make|set|get)\s+(.+?)\s+(?:a\s+(?:bit|little)\s+|slightly\s+|much\s+)?(wider|bigger|larger|longer|narrower|smaller|shorter|thinner)(?:\s+by\s+(.+))?$/i.exec(t))) { const r = cmdResizeFix(resolveRef(m[1], 'fixture') || resolveRef(m[1]), /wider|bigger|larger|longer/i.test(m[2]) ? 'grow' : 'shrink', m[3] ? cmdLen(m[3]) : null); if (r) return r; }
+  if ((m = /^(widen|enlarge|lengthen|narrow|shrink|shorten)\s+(.+?)(?:\s+by\s+(.+))?$/i.exec(t))) { const r = cmdResizeFix(resolveRef(m[2], 'fixture') || resolveRef(m[2]), /widen|enlarge|lengthen/i.test(m[1]) ? 'grow' : 'shrink', m[3] ? cmdLen(m[3]) : null); if (r) return r; }
+  if ((m = new RegExp(String.raw`^(?:make|set|resize)\s+(.+?)\s+(?:to\s+|be\s+)?${LEN}(?:\s+(?:wide|long|across|width))?$`, 'i').exec(t))) { const r = cmdResizeFix(resolveRef(m[1], 'fixture') || resolveRef(m[1]), 'set', cmdLen(m[2])); if (r) return r; }
+  // move a wall / corner by an amount
+  if ((m = new RegExp(String.raw`^(?:move|push|pull|shift|drag|slide|nudge)\s+(?:the\s+)?(.*?)\s*wall(?:\s+(?:of|in|on)\s+(?:the\s+)?(.+?))?\s+(?:by\s+)?${LEN}\s+(?:to\s+the\s+|towards?\s+the\s+)?(left|right|up|down|north|south|east|west|in|inward|inwards|out|outward|outwards)$`, 'i').exec(t))) {
+    const w = resolveWall(m[1], m[2]); if (!w) return { ok: false, msg: 'Which wall? Say e.g. “move the left wall 6 inches right”, or tap a wall in Edit Room and say “move this wall 6 inches up”.' };
+    const amt = cmdLen(m[3]), d = m[4].toLowerCase(); let vec = CMD_DIRS[d];
+    if (!vec) { const [p, q] = edgeSeg(w.r, w.e), u = V.norm(V.sub(q, p)); let n = [-u[1], u[0]]; const mid = V.mul(V.add(p, q), .5); if (!pointInPoly(V.add(mid, V.mul(n, 2)), roomPoly(w.r))) n = [-n[0], -n[1]]; vec = /^in/.test(d) ? n : [-n[0], -n[1]]; }
+    return cmdMoveBy({ kind: 'wall', r: w.r, e: w.e }, V.mul(vec, amt), amt);
+  }
+  if ((m = new RegExp(String.raw`^(?:move|drag|shift|push|pull|nudge)\s+(?:the\s+)?(?:(top|bottom|upper|lower)[\s-]*(left|right)|this|that|selected|the selected)\s+corner(?:\s+(?:of|in)\s+(?:the\s+)?(.+?))?\s+(?:by\s+)?${LEN}\s+(?:to\s+the\s+)?(left|right|up|down|north|south|east|west)$`, 'i').exec(t))) {
+    let r, v;
+    if (!m[1]) { if (UI.sel.kind !== 'corner') return { ok: false, msg: 'Select a corner first (Edit Room → tap a room → tap an orange dot)' }; r = roomById(UI.sel.id); v = UI.sel.v; }
+    else { r = m[3] ? (resolveRef(m[3], 'room') || {}).r : targetRoom(); if (!r) return { ok: false, msg: 'Which room?' }; const cp = cornerPoint(r, CMD_SIDE[m[1].toLowerCase()][0] + m[2].toLowerCase()[0]), P = roomPoly(r); v = 0; P.forEach((p, i) => { if (V.len(V.sub(p, cp)) < V.len(V.sub(P[v], cp))) v = i; }); }
+    const amt = cmdLen(m[4]); if (!moveCornerBy(r, v, V.mul(CMD_DIRS[m[5].toLowerCase()], amt))) return { ok: false, msg: 'Couldn’t move that corner there (walls would cross or overlap another room)' };
+    UI.sel = { kind: 'room', id: r.id }; commit(); return { ok: true, msg: `Moved a corner of ${r.name} ${fmtIn(amt)} ${m[5].toLowerCase()}` };
+  }
+  // move an item by an amount / to a side
+  if ((m = new RegExp(String.raw`^(?:move|shift|slide|nudge|push|drag)\s+(.+?)\s+(?:by\s+)?${LEN}\s+(?:to\s+the\s+|towards?\s+the\s+|further\s+)?(left|right|up|down|north|south|east|west)$`, 'i').exec(t))) { const amt = cmdLen(m[2]), vec = CMD_DIRS[m[3].toLowerCase()]; return cmdMoveBy(resolveRef(m[1], 'any', canSlide(vec)), V.mul(vec, amt), amt); }
+  if ((m = /^(?:move|shift|slide|put|nudge|place)\s+(.+?)\s+(?:to|towards?|onto|on|over to)\s+(?:the\s+)?(left|right|top|bottom|up|down|north|south|east|west)(?:\s+(wall|side|end))?(?:\s+(?:of|in)\s+(?:the\s+)?(.+))?$/i.exec(t))) return cmdMoveTo(resolveRef(m[1]), m[2].toLowerCase(), m[3] && m[3].toLowerCase() === 'end' ? 'end' : m[3] ? 'wall' : null, m[4]);
+  if ((m = /^(?:move|shift|slide|nudge)\s+(.+?)\s+(left|right|up|down)$/i.exec(t))) return cmdMoveTo(resolveRef(m[1]), m[2].toLowerCase(), null, null);
+  // add / delete
+  if ((m = /^(?:add|create|insert|put in|draw)\s+(.+)$/i.exec(t))) { const r = cmdAdd(m[1]); if (r) return r; }
+  if ((m = /^(?:delete|remove|erase|get rid of|take out|take away)\s+(.+)$/i.exec(t))) return cmdDelete(m[1]);
+  // "make that the first bedroom" / "the hallway is actually the first bedroom" / "change the hallway to a bedroom"
+  const asWhat = (tp, art, val) => { const ty = cmdType(val); if (ty && art && /^an?$/i.test(art)) return cmdSetType(tp, ty); if (ty && !art) return cmdSetType(tp, ty); return cmdRename(tp, val); };
+  if ((m = /^(?:make|turn|change|convert|set|mark)\s+(.+?)\s+(?:into\s+|to\s+|as\s+)?(the|a|an)\s+(.+)$/i.exec(t)) && (isSelf(m[1]) || resolveRef(m[1]))) return asWhat(m[1], m[2], m[3]);
+  if ((m = /^(?:change|turn|convert|set)\s+(.+?)\s+(?:to|into)\s+(.+)$/i.exec(t)) && (isSelf(m[1]) || resolveRef(m[1]))) return asWhat(m[1], null, m[2]);
+  if ((m = /^(.+?)\s+is\s+(?:actually\s+|really\s+|supposed to be\s+|meant to be\s+)?(the|a|an|my)\s+(.+)$/i.exec(t)) && (isSelf(m[1]) || resolveRef(m[1]))) return asWhat(m[1], m[2] === 'my' ? 'the' : m[2], m[3]);
+  return null;
+}
+const CMD_HELP = 'Couldn’t quite do that – try e.g. “rename the hallway to first bedroom”, “straighten the living room” or “make the door wider”.';
+function doCommand(text) {
+  let res; try { res = runCommand(text); } catch (e) { res = { ok: false, msg: 'Something went wrong with that command – nothing was changed. ' + CMD_HELP }; try { const b = hist.stack[hist.idx]; if (b) { S = JSON.parse(b); fixSelection(); refreshAll(); } } catch (_) { } }
+  if (!res) res = { ok: false, msg: CMD_HELP };
+  const out = $('#cmdOut'); if (out) { out.textContent = (res.ok ? '✓ ' : '') + res.msg; out.className = 'small ' + (res.ok ? 'ok' : 'bad'); out.title = res.msg; }
+  window.__lastCmd = res; return res;
+}
+const CMD_HKEY = 'roomPlanner.cmdHistory', CMD_OKEY = 'roomPlanner.cmdOpen';
+function bindCmd() {
+  const box = $('#cmdbox'), inp = $('#cmdIn'); if (!box) return;
+  let H = []; try { H = JSON.parse(localStorage.getItem(CMD_HKEY) || '[]').filter(x => typeof x === 'string').slice(-30); } catch (e) { }
+  let hi = H.length;
+  const setOpen = (o, focus) => { box.classList.toggle('open', o); $('#stage').classList.toggle('cmd-open', o); document.body.classList.toggle('cmd-open', o && innerWidth > 820); try { localStorage.setItem(CMD_OKEY, o ? '1' : '0'); } catch (e) { } if (o && focus) inp.focus(); };
+  let o0 = null; try { o0 = localStorage.getItem(CMD_OKEY); } catch (e) { }
+  setOpen(o0 === '1', false);
+  $('#cmdToggle').onclick = () => setOpen(true, true); $('#cmdMin').onclick = () => setOpen(false);
+  $('#cmdForm').onsubmit = e => {
+    e.preventDefault(); const v = inp.value.trim(); if (!v) return;
+    if (H[H.length - 1] !== v) H.push(v); H = H.slice(-30); hi = H.length; try { localStorage.setItem(CMD_HKEY, JSON.stringify(H)); } catch (err) { }
+    const res = doCommand(v); if (res.ok) inp.value = '';
+  };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp') { if (H.length) { hi = Math.max(0, hi - 1); inp.value = H[hi]; e.preventDefault(); } }
+    else if (e.key === 'ArrowDown') { hi = Math.min(H.length, hi + 1); inp.value = H[hi] || ''; e.preventDefault(); }
+    else if (e.key === 'Escape') { inp.value = ''; inp.blur(); }
+  });
+  svg.addEventListener('pointerdown', () => { if (document.activeElement === inp) inp.blur(); });
 }
 
 /* ---- 70-share.js ---- */
@@ -3437,9 +4103,9 @@ function boot() {
   try { const u = JSON.parse(localStorage.getItem(CONFIG.keys.ui) || '{}'); if (typeof u.snap === 'boolean') UI.snap = u.snap; if (CONFIG.gridChoices.includes(u.grid)) UI.grid = u.grid; if (typeof u.badges === 'boolean') UI.badges = u.badges; } catch (e) { }
   if (/^#plan=/.test(location.hash)) UI.readonly = true;
   loadAutosaveOrDefault();
-  initUI(); initShare(); bindVibe(); bindRoomCard(); bindFeng(); bindSketch(); bindVideo();
+  initUI(); initShare(); bindVibe(); bindRoomCard(); bindFeng(); bindSketch(); bindVideo(); if (typeof bindEdit === 'function') bindEdit(); if (typeof bindCmd === 'function') bindCmd();
   histReset(); refreshAll(); fitAll(); renderLayouts();
-  window.__planner = { fengEval, layoutIssues, quickIssues, buildReasoning, whyHere, reasoningForExport, randomizeRoom, generateLayout, FAILS, roomCtx, piecesIn, tvViewers, walkStatus, getKua, kuaNumber, kuaInfo, highlightIds, openDesignNotes, get S() { return S; }, UI, CONFIG, hist, commit, importPlan, serializePlan, fitAll, render, setMode, setSketchTool, sketchFinishWalls, polyToRoomSpec, analyzeFrames, openVideoModal, get videoState() { return VID; } };
+  window.__planner = { fengEval, layoutIssues, quickIssues, buildReasoning, whyHere, reasoningForExport, randomizeRoom, generateLayout, FAILS, roomCtx, piecesIn, tvViewers, walkStatus, getKua, kuaNumber, kuaInfo, highlightIds, openDesignNotes, get S() { return S; }, UI, CONFIG, hist, commit, importPlan, serializePlan, fitAll, render, setMode, setSketchTool, sketchFinishWalls, polyToRoomSpec, analyzeFrames, openVideoModal, get videoState() { return VID; }, straightenRoom, insertCorner, removeCorner, edgeKey, runCommand: typeof runCommand === 'function' ? runCommand : null, setHelp };
 }
 boot();
 if (/^#plan=/.test(location.hash)) loadFromHash(true);
